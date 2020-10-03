@@ -31,7 +31,7 @@ Connections
 
 The Audio out of the  TEA5767 module is connected to an Audio amplifier and speaker.
  
- ![ Tea5767 ](https://github.com/gavinlyonsrepo/STM/blob/master/images/tea5767.jpg)
+ ![ Tea5767 ](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/tea5767.jpg)
  
  Output
  -----------------------
