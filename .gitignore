@@ -1,1 +1,11 @@
 stuff/
+
+# eclipse specific git ignore
+projects/tm1638plus/src/.metadata/
+projects/tm1638plus/src/RemoteSystemsTempFiles/
+projects/tm1638plus/src/.settings/
+projects/tm1638plus/src/Debug/
+projects/tm1638plus/src/*.launch
+
+# STM32 git ignore
+projects/tm1638plus/src/*.mxproject

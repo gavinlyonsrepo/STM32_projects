@@ -1,5 +1,7 @@
 # Changelog
 
-* version 1.0.0 Sep 2020
-	* FM radio project 
+* Sep 2020
+	* FM radio project  added
 
+* April 2020
+	* Tm1638plus project added 
