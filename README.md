@@ -13,7 +13,7 @@ Project List
 
 | Num | IC | IDE | Desc | Link |
 | --- | --- | --- | --- | --- |
-| 1 |  STM32F103C8T6  "Blue Pill" | Arduino IDE |  FM Radio | [URL ](projects/fmradio) |
-| 2 |  STM32F303K8T6 Nucleo-32 | STM32CubeF3 | TM1638 library | [URL ](projects/tm1638plus) |
-| 3 |  --- |---- | --- | --- |
+| 1 |  STM32F103C8T6  "Blue Pill" | Arduino IDE C++ |  FM Radio project | [URL ](projects/fmradio) |
+| 2 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C++ | TM1638 library | [URL ](projects/tm1638plus) |
+| 3 |  STM32F070RBT6 Nucleo-64 | STM32CubeIDE C++ | ERM19264_UC1609C LCD library| [URL ](projects/ERM19264_UC1609C)|
 | 4 |  --- |---- | --- | --- |
