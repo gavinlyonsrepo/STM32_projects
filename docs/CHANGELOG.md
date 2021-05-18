@@ -7,3 +7,6 @@
 	* Tm1638plus library added 
 	* ERM19264_UC1609C library added
 	* Nokia 5110 text library added
+
+* May 2021
+	* ST7735 library added.

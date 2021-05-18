@@ -14,6 +14,12 @@ Software used
 -----------------------------
 1. Arduino IDE  v. 1.8.10 , C++
 
+
+TODO
+--------------
+1. Settings menu 
+2. Store radio stations in EEPROM
+
 Connections
 ------------------------------
 
