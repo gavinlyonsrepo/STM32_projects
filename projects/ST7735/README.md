@@ -70,9 +70,10 @@ Note: The library was developed on a
 TFT without built-in SD card feature.
 
 1. Draw small custom icons X by 8 size where X is 0-128
-useful to create icons or buttons or fill rows with patterns
+useful to create icons or buttons or fill rows with patterns.
+vertically addressed.
 
-2. Draw bitmap.
+2. Draw bitmap, horizontally addressed.
  
 
 **Connections**

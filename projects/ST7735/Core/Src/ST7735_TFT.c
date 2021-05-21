@@ -1010,7 +1010,7 @@ void drawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t backcolo
 // Param 1,2  X,Y screen co-ord
 // Param 3,4 0-127 possible values width and height of bitmap in pixels 
 // Param 4,5 bitmap colors ,bitmap is bi-color
-// Param 6: an array of unsigned chars containing bitmap data vertically addressed.
+// Param 6: an array of unsigned chars containing bitmap data horizontally addressed.
 void drawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const unsigned char bitmap[]) {
     int16_t byteWidth = (w + 7) / 8;
     uint8_t byte = 0;
