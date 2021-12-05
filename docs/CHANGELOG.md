@@ -10,3 +10,6 @@
 
 * May 2021
 	* ST7735 library added.
+
+* Dec 2021 
+	* AHT10 Sensor library added 
