@@ -13,3 +13,4 @@
 
 * Dec 2021 
 	* AHT10 Sensor library added 
+	* LM75A Sensor library added
