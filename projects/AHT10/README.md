@@ -10,7 +10,7 @@ Library for AHT10 Integrated temperature and humidity sensor
 Features
 ----------------------
 
- ![ output ](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/aht10.jpg)
+ ![o](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/aht10.jpg)
  
 
 This is an STM32 library for Aosong ASAIR AHT10, AHT15 & AHT20 Digital Humidity & Temperature Sensor I2C.
@@ -34,11 +34,16 @@ Supports sensors features:
 
 **Connections**
 
-The Sensor uses I2C for communication's, Data is outputted (eg to a PC) via a UART .
+The Sensor uses I2C for communication's. Data is outputted (eg to a PC) via a USART .
 pins  used are in file AHT10_project.txt.
 
 **Files**
 
 The Main.c contains tests showing library functions
 There is also an  library (AHT10.c and AHT10.h),
+
+**Output**
+
+Data is outputted (eg to a PC) via a USART .
+ ![o1](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/aht10output.jpg)
 
