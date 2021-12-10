@@ -3,11 +3,12 @@
 // Example file name : main.cpp
 // Description:
 // Test file for ERM19264_UC1609_library,
-// multi buffer mode. 
+// multi-buffer mode.
 // *****************************
 // NOTES :
-// (1) This is for Hardware SPI
+// (1) Hardware SPI
 // ******************************
+// URL: https://github.com/gavinlyonsrepo/STM32_projects
  */
 
 /* USER CODE END Header */
@@ -39,7 +40,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
-
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -316,7 +316,7 @@ void display_Left(MultiBuffer* targetbuffer)
   mylcd.setCursor(0, 40);
 
   mylcd.setCursor(0, 50);
-  mylcd.print("V 1.1.0");
+  mylcd.print("V 1.3.0");
   mylcd.drawFastVLine(92, 0, 63, FOREGROUND);
   mylcd.LCDupdate();
 }

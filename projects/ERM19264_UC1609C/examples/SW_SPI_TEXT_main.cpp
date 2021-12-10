@@ -6,7 +6,9 @@
 // multi buffer mode. Text exmaple
 // *****************************
 // NOTES :
-// (1) Software SPI
+   (1) Software SPI
+   (2) test 7 8 9 require the repsective fonts commented in
+    custom_graphics_font.h file FONT DEFINE SECTION
 // ******************************
  */
 
@@ -52,7 +54,9 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-void  DisplayText(MultiBuffer* targetBuffer);
+void DisplayText(MultiBuffer* targetBuffer);
+void TestReset(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -282,16 +286,22 @@ static void MX_GPIO_Init(void)
 // Test 3 font size 1 string inverted
 // Test 4 draw a single character font size 4
 // Test 5 print ASCII  font 0-127
-// Test 6 print ASCII font 128-255, commented out as not setup by default, see note 4 at top of file.
+// Test 6 print ASCII font 128-255.
+// Test 7 print font 2 3 4
+// Test 8 print font 5 big num
+// Test 9 print font 6 med num
 void  DisplayText(MultiBuffer* targetBuffer)
 {
+	  char myString[9] = {'1', '3', ':', '2', '6', ':', '1', '8'};
 	  mylcd.setTextWrap(true);
 	  mylcd.ActiveBuffer =  targetBuffer;
 	  mylcd.LCDclearBuffer(); // Clear the buffer
+
 	  while (1)
 	  {
 	    // Test 1
-	    mylcd.setTextColor(FOREGROUND);
+		mylcd.setFontNum(1);
+		mylcd.setTextColor(FOREGROUND);
 	    mylcd.setTextSize(3);
 	    mylcd.setCursor(0, 0);
 	    mylcd.print("345.897");
@@ -310,9 +320,7 @@ void  DisplayText(MultiBuffer* targetBuffer)
 	    // Test 4
 	    mylcd.drawChar(150, 25 , 'H', FOREGROUND, BACKGROUND, 4);
 
-	    mylcd.LCDupdate();  // Write to the buffer
-	    HAL_Delay(DisplayDelay1);
-	    mylcd.LCDclearBuffer();
+	    TestReset();
 
 	    // Test 5
 	    mylcd.setCursor(0, 0);
@@ -327,13 +335,9 @@ void  DisplayText(MultiBuffer* targetBuffer)
 	      mylcd.print(i);
 	      HAL_Delay(DisplayDelay2);
 	    }
-	    mylcd.LCDupdate();  // Write to the buffer
-	    HAL_Delay(DisplayDelay1);
-	    mylcd.LCDclearBuffer();
+	    TestReset();
 
-	    // Test 6, commented out as not setup by default, see note 4 at top of file.
-
-
+	    // Test 6,
 	    mylcd.setCursor(0, 0);
 	    mylcd.setTextColor(FOREGROUND);
 	    mylcd.setTextSize(1);
@@ -355,11 +359,55 @@ void  DisplayText(MultiBuffer* targetBuffer)
 	      HAL_Delay(DisplayDelay2);
 	    }
 
-	    mylcd.LCDupdate();  // Write to the buffer
-	    HAL_Delay(DisplayDelay1);
-	    mylcd.LCDclearBuffer();
+	    TestReset();
+
+	    // Test 7  fonts 2-4
+	    mylcd.setTextSize(2);
+
+	    mylcd.setFontNum(2);
+		mylcd.setCursor(0, 0);
+		mylcd.print("THICK");
+
+	    mylcd.setFontNum(3);
+		mylcd.setCursor(0, 20);
+		mylcd.print("3354610");
+
+	    mylcd.setFontNum(4);
+		mylcd.setCursor(0, 40);
+		mylcd.print("WIDE");
+
+		TestReset();
+
+	    // Test 8 font 5
+	    mylcd.setFontNum(5);
+	    mylcd.setTextColor(FOREGROUND, BACKGROUND);
+	    mylcd.setCursor(80,0);
+	    mylcd.print(859);
+	    mylcd.drawTextNumFont(0, 32, myString , BACKGROUND, FOREGROUND); //7b drawTextNumFont , 13:26:18 inverted
+	    mylcd.drawCharNumFont(0, 0, '8', FOREGROUND, BACKGROUND); // 7c drawCharNumFont
+	    mylcd.drawCharNumFont(160, 0, '4', BACKGROUND, FOREGROUND); // 7d drawCharNumFont inverted
+
+	    TestReset();
+
+	    // Test 9 font 6
+		mylcd.setFontNum(6);
+		mylcd.setCursor(80,0);
+		mylcd.print(993);
+		mylcd.drawTextNumFont(0, 32, myString , BACKGROUND, FOREGROUND); // 8b drawTextNumFont , 13:26:18 inverted
+		mylcd.drawCharNumFont(0, 0, '6', FOREGROUND, BACKGROUND); // 8c drawCharNumFont
+		mylcd.drawCharNumFont(160, 0, '6', BACKGROUND, FOREGROUND); // 8d drawCharNumFont inverted
+
+		TestReset();
+
 
 	  } // while
+}
+
+void TestReset(void)
+{
+  mylcd.LCDupdate();  // Write to the buffer
+  HAL_Delay(DisplayDelay1);
+  mylcd.LCDclearBuffer();
 }
 /* USER CODE END 4 */
 

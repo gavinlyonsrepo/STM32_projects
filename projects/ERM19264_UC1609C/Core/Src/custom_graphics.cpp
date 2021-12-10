@@ -1,15 +1,3 @@
-/*
-This is the core graphics library for all ADAFRUIT displays, providing a common
-set of graphics primitives (points, lines, circles, etc.).  It needs to be
-paired with a hardware-specific library for each display device we carry
-(to handle the lower-level functions).
-Adafruit invests time and resources providing this open source code, please
-support Adafruit & open-source hardware by purchasing products from Adafruit!
-Copyright (c) 2013 Adafruit Industries.  All rights reserved.
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-- Redistributions of source code must retain the above copyright notice.
-*/
 
 /*
 * Project Name: ERM19264_UC1609
@@ -30,13 +18,13 @@ custom_graphics::custom_graphics(int16_t w, int16_t h):
   rotation  = 0;
   cursor_y  = cursor_x    = 0;
   textsize  = 1;
-  textcolor = textbgcolor = 0xFFFF;
+  textcolor = textbgcolor = 0xFF;
   wrap      = true;
 }
 
 // Draw a circle outline
 void custom_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
-    uint16_t color) {
+    uint8_t color) {
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
   int16_t ddF_y = -2 * r;
@@ -70,7 +58,7 @@ void custom_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
 }
 
 void custom_graphics::drawCircleHelper( int16_t x0, int16_t y0,
-               int16_t r, uint8_t cornername, uint16_t color) {
+               int16_t r, uint8_t cornername, uint8_t color) {
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
   int16_t ddF_y = -2 * r;
@@ -106,14 +94,14 @@ void custom_graphics::drawCircleHelper( int16_t x0, int16_t y0,
 }
 
 void custom_graphics::fillCircle(int16_t x0, int16_t y0, int16_t r,
-			      uint16_t color) {
+			      uint8_t color) {
   drawFastVLine(x0, y0-r, 2*r+1, color);
   fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
 // Used to do circles and roundrects
 void custom_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
-    uint8_t cornername, int16_t delta, uint16_t color) {
+    uint8_t cornername, int16_t delta, uint8_t color) {
 
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
@@ -145,7 +133,7 @@ void custom_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
 // Bresenham's algorithm - thx wikpedia
 void custom_graphics::drawLine(int16_t x0, int16_t y0,
 			    int16_t x1, int16_t y1,
-			    uint16_t color) {
+			    uint8_t color) {
   int16_t steep = abs(y1 - y0) > abs(x1 - x0);
   if (steep) {
     swap(x0, y0);
@@ -187,7 +175,7 @@ void custom_graphics::drawLine(int16_t x0, int16_t y0,
 // Draw a rectangle
 void custom_graphics::drawRect(int16_t x, int16_t y,
 			    int16_t w, int16_t h,
-			    uint16_t color) {
+			    uint8_t color) {
   drawFastHLine(x, y, w, color);
   drawFastHLine(x, y+h-1, w, color);
   drawFastVLine(x, y, h, color);
@@ -195,32 +183,32 @@ void custom_graphics::drawRect(int16_t x, int16_t y,
 }
 
 void custom_graphics::drawFastVLine(int16_t x, int16_t y,
-				 int16_t h, uint16_t color) {
+				 int16_t h, uint8_t color) {
   // Update in subclasses if desired!
   drawLine(x, y, x, y+h-1, color);
 }
 
 void custom_graphics::drawFastHLine(int16_t x, int16_t y,
-				 int16_t w, uint16_t color) {
+				 int16_t w, uint8_t color) {
   // Update in subclasses if desired!
   drawLine(x, y, x+w-1, y, color);
 }
 
 void custom_graphics::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
-			    uint16_t color) {
+			    uint8_t color) {
   // Update in subclasses if desired!
   for (int16_t i=x; i<x+w; i++) {
     drawFastVLine(i, y, h, color);
   }
 }
 
-void custom_graphics::fillScreen(uint16_t color) {
+void custom_graphics::fillScreen(uint8_t color) {
   fillRect(0, 0, _width, _height, color);
 }
 
 // Draw a rounded rectangle
 void custom_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
-  int16_t h, int16_t r, uint16_t color) {
+  int16_t h, int16_t r, uint8_t color) {
   // smarter version
   drawFastHLine(x+r  , y    , w-2*r, color); // Top
   drawFastHLine(x+r  , y+h-1, w-2*r, color); // Bottom
@@ -235,7 +223,7 @@ void custom_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
 
 // Fill a rounded rectangle
 void custom_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
-				 int16_t h, int16_t r, uint16_t color) {
+				 int16_t h, int16_t r, uint8_t color) {
   // smarter version
   fillRect(x+r, y, w-2*r, h, color);
 
@@ -247,7 +235,7 @@ void custom_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
 // Draw a triangle
 void custom_graphics::drawTriangle(int16_t x0, int16_t y0,
 				int16_t x1, int16_t y1,
-				int16_t x2, int16_t y2, uint16_t color) {
+				int16_t x2, int16_t y2, uint8_t color) {
   drawLine(x0, y0, x1, y1, color);
   drawLine(x1, y1, x2, y2, color);
   drawLine(x2, y2, x0, y0, color);
@@ -256,7 +244,7 @@ void custom_graphics::drawTriangle(int16_t x0, int16_t y0,
 // Fill a triangle
 void custom_graphics::fillTriangle ( int16_t x0, int16_t y0,
 				  int16_t x1, int16_t y1,
-				  int16_t x2, int16_t y2, uint16_t color) {
+				  int16_t x2, int16_t y2, uint8_t color) {
 
   int16_t a, b, y, last;
 
@@ -333,45 +321,102 @@ void custom_graphics::fillTriangle ( int16_t x0, int16_t y0,
 }
 
 size_t custom_graphics::write(uint8_t c) {
-  if (c == '\n') {
-    cursor_y += textsize*8;
-    cursor_x  = 0;
-  } else if (c == '\r') {
-    // skip em
-  } else {
-    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-    cursor_x += textsize*6;
-    if (wrap && (cursor_x > (_width - textsize*6))) {
-      cursor_y += textsize*8;
-      cursor_x = 0;
-    }
-  }
+if (_FontNumber < 5)
+	{
+		if (c == '\n') 
+		{
+			cursor_y += textsize*_CurrentFontheight;
+			cursor_x  = 0;
+		} else if (c == '\r') 
+		{
+			// Skip 
+		} else 
+		{
+			drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+			cursor_x += textsize*(_CurrentFontWidth+1);
+			if (wrap && (cursor_x > (_width - textsize*(_CurrentFontWidth+1)))) 
+			{
+				cursor_y += textsize*_CurrentFontheight;
+				cursor_x = 0;
+			}
+		}
+		
+	}else if (_FontNumber == 5 || _FontNumber == 6)
+	{
+		uint8_t radius = 3;
+		if (_FontNumber == 6) radius = 2;
+		
+		if (c == '\n') 
+		{
+			cursor_y += _CurrentFontheight;
+			cursor_x  = 0;
+		} else if (c == '\r') 
+		{
+			// Skip
+		} else if (c == '.')
+		{
+			// draw a circle for decimal point skip a space.
+			
+			fillCircle(cursor_x+(_CurrentFontWidth/2), cursor_y + (_CurrentFontheight-6), radius, textcolor);
+			cursor_x += (_CurrentFontWidth+1);
+			if (wrap && (cursor_x  > (_width - (_CurrentFontWidth+1)))) 
+			{
+				cursor_y += _CurrentFontheight;
+				cursor_x = 0;
+			}
+		}else 
+		{
+			drawCharNumFont(cursor_x, cursor_y, c, textcolor, textbgcolor);
+			cursor_x += (_CurrentFontWidth+1);
+			if (wrap && (cursor_x > (_width - (_CurrentFontWidth+1)))) 
+			{
+				cursor_y += _CurrentFontheight;
+				cursor_x = 0;
+			}
+		}
 
+	}
   return 1;
 
 }
 
 // Draw a character
 void custom_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
-			    uint16_t color, uint16_t bg, uint8_t size) {
+			    uint8_t color, uint8_t bg, uint8_t size) {
 
   if((x >= _width)            || // Clip right
      (y >= _height)           || // Clip bottom
-     ((x + 6 * size - 1) < 0) || // Clip left
-     ((y + 8 * size - 1) < 0))   // Clip top
+     ((x + (_CurrentFontWidth+1) * size - 1) < 0) || // Clip left
+     ((y + _CurrentFontheight * size - 1) < 0))   // Clip top
     return;
 
-  for (int8_t i=0; i<6; i++ ) {
+  for (int8_t i=0; i<(_CurrentFontWidth+1); i++ ) {
     uint8_t line;
-    if (i == 5)
+    if (i == _CurrentFontWidth)
     { 
       line = 0x0;
     }
     else 
     {
-           line = custom_font[(c*5)+i];
+           	switch (_FontNumber) {
+#ifdef UC1609_Font_One
+				case 1: line = UC_Font_One[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+#endif 
+#ifdef UC1609_Font_Two
+				case 2: line = UC_Font_Two[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+#endif
+#ifdef UC1609_Font_Three
+				case 3: line = UC_Font_Three[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+#endif
+#ifdef UC1609_Font_Four
+				case 4: line = UC_Font_Four[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+#endif
+				default: // wrong font number
+						return;
+				break;
+				}
     }
-    for (int8_t j = 0; j<8; j++) {
+    for (int8_t j = 0; j<_CurrentFontheight; j++) {
       if (line & 0x1) {
         if (size == 1) // default size
           drawPixel(x+i, y+j, color);
@@ -399,13 +444,13 @@ void custom_graphics::setTextSize(uint8_t s) {
   textsize = (s > 0) ? s : 1;
 }
 
-void custom_graphics::setTextColor(uint16_t c) {
+void custom_graphics::setTextColor(uint8_t c) {
   // For 'transparent' background, we'll set the bg 
   // to the same as fg instead of using a flag
   textcolor = textbgcolor = c;
 }
 
-void custom_graphics::setTextColor(uint16_t c, uint16_t b) {
+void custom_graphics::setTextColor(uint8_t c, uint8_t b) {
   textcolor   = c;
   textbgcolor = b; 
 }
@@ -443,7 +488,153 @@ int16_t custom_graphics::height(void) const {
   return _height;
 }
 
+// Desc: writes a char (c) on the TFT
+// Param 1 , 2 : coordinates (x, y).
+// Param 3: The ASCII character
+// Param 4: color 
+// Param 5: background color
+// Notes for font 5 & font 6 (bignums  + mednums)  only
+void custom_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
+{
+
+	uint8_t i, j;
+	uint8_t ctemp = 0, y0 = y; 
+
+	for (i = 0; i < (_CurrentFontheight*2); i++) 
+	{
+		if (_FontNumber == 5){
+		#ifdef UC1609_Font_Five
+			ctemp = UC_Font_Five[c - _CurrentFontoffset][i];
+		#endif
+		}
+		else if (_FontNumber == 6){
+		#ifdef UC1609_Font_Six
+			ctemp = UC_Font_Six[c - _CurrentFontoffset][i];
+		#endif
+		}else{ 
+			return;
+		}
+		
+		for (j = 0; j < 8; j++) 
+		{
+			if (ctemp & 0x80) 
+			{
+				drawPixel(x, y, color);
+			} else {
+				drawPixel(x, y, bg);
+			}
+
+			ctemp <<= 1;
+			y++;
+			if ((y - y0) == _CurrentFontheight) {
+				y = y0;
+				x++;
+				break;
+			}
+	}
+	}
+}
+
 void custom_graphics::invertDisplay(bool i) {
   // Do nothing, must be subclassed if supported
 }
 
+// Desc: Writes text string (*ptext) on the TFT 
+// Param 1 , 2 : coordinates (x, y).
+// Param 3: pointer to string 
+// Param 4: color 
+// Param 5: background color
+// Notes for font 5 & font 6 (bignums  + mednums)  only
+void custom_graphics::drawTextNumFont(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg) 
+{
+
+	if (_FontNumber < 5)
+	{
+		return;
+	}
+
+	while (*pText != '\0') 
+	{
+		if (x > (_width - _CurrentFontWidth )) 
+		{
+			x = 0;
+			y += _CurrentFontheight ;
+			if (y > (_height - _CurrentFontheight)) 
+			{
+					y = x = 0;
+			}
+		}
+
+		drawCharNumFont(x, y, *pText, color, bg);
+		x += _CurrentFontWidth ;
+		pText++;
+	}
+}
+
+// Desc :  Set the font number
+// Param1: fontnumber 1-5
+// 1=default 2=thick 3=seven segment 4=wide 5=bignums 6 = mednums
+
+void custom_graphics::setFontNum(uint8_t FontNumber)
+{
+	_FontNumber = FontNumber;
+	
+	enum LCD_Font_width
+	{
+		FONT_W_FIVE = 5, FONT_W_SEVEN = 7, FONT_W_FOUR = 4, FONT_W_EIGHT = 8,FONT_W_16= 16
+	}; // width of the font in bytes cols.
+	
+	enum LCD_Font_offset
+	{
+		FONT_O_EXTEND = ERM19264_ASCII_OFFSET, FONT_O_SP = ERM19264_ASCII_OFFSET_SP, FONT_N_SP = ERM19264_ASCII_OFFSET_NUM
+	}; // font offset in the ASCII table
+	
+	enum LCD_Font_height
+	{
+		FONT_H_8 = 8, FONT_H_16 = 16, FONT_H_32 = 32
+	}; // width of the font in bits
+	
+	enum LCD_Font_width setfontwidth;
+	enum LCD_Font_offset setoffset;
+	enum LCD_Font_height setfontheight;
+	
+	switch (_FontNumber) {
+		case 1:  // Norm default 5 by 8
+			_CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
+			_CurrentFontoffset =  (setoffset = FONT_O_EXTEND);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 2: // Thick 7 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = (setfontwidth = FONT_W_SEVEN);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 3:  // Seven segment 4 by 8
+			_CurrentFontWidth = (setfontwidth = FONT_W_FOUR);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break;
+		case 4: // Wide  8 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = (setfontwidth = FONT_W_EIGHT);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 5: // big nums 16 by 32 (NUMBERS + : only)
+			_CurrentFontWidth = (setfontwidth = FONT_W_16);
+			_CurrentFontoffset =  (setoffset = FONT_N_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_32);
+		break; 
+		case 6: // med nums 16 by 16 (NUMBERS + : only)
+			_CurrentFontWidth = (setfontwidth = FONT_W_16);
+			_CurrentFontoffset =  (setoffset = FONT_N_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_16);
+		break; 
+		default: // if wrong font num passed in,  set to default
+			_CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
+			_CurrentFontoffset =  (setoffset = FONT_O_EXTEND);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+			_FontNumber = 1;
+		break;
+	}
+	
+}

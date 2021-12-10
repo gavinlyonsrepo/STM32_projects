@@ -89,7 +89,15 @@ void ERM19264_UC1609::LCDReset ()
   HAL_Delay(UC1609_RESET_DELAY2);
 }
 
-// Desc: turns in display
+// Desc: Powerdown procedure for LCD see datasheet P40
+void ERM19264_UC1609::LCDPowerDown(void)
+{
+  LCDReset ();
+  LCDEnable(0);
+}
+
+
+// Desc: turns on display
 // Param1: bits 1  on , 0 off
 void ERM19264_UC1609::LCDEnable (uint8_t bits) 
 {
@@ -315,7 +323,7 @@ UC1609_CS_SetHigh;
 
 // Desc: Draws a Pixel to the screen overides the custom graphics library
 // Passed x and y co-ords and colour of pixel.
-void ERM19264_UC1609::drawPixel(int16_t x, int16_t y, uint16_t colour) 
+void ERM19264_UC1609::drawPixel(int16_t x, int16_t y, uint8_t colour) 
 {
     
 #ifdef MULTI_BUFFER
@@ -373,7 +381,7 @@ void ERM19264_UC1609::LCDNoBufferChar(unsigned char  character)
 
    for (uint8_t column = 0 ; column <  UC1609_FONTWIDTH ; column++)
     {
-	   send_data((uint8_t)(custom_font[(character*UC1609_FONTWIDTH) + column]));
+	   send_data((uint8_t)(UC_Font_One[(character*UC1609_FONTWIDTH) + column]));
     }
     UC1609_FONTPADDING;
     UC1609_CS_SetHigh;

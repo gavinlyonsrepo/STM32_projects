@@ -79,10 +79,10 @@
 #define UC1609_ROTATION_FLIP_THREE 0x00
 
 // Delays
-#define UC1609_RESET_DELAY 50 // mS delay
-#define UC1609_RESET_DELAY2   0 // mS delay
-#define UC1609_INIT_DELAY 100   //  mS delay
-#define UC1609_INIT_DELAY2 3 // mS delay
+#define UC1609_RESET_DELAY 3 // ms Delay
+#define UC1609_RESET_DELAY2   0 // mS delay datasheet says 5mS, does not work
+#define UC1609_INIT_DELAY 100   //  mS delay ,after init 
+#define UC1609_INIT_DELAY2 3 // mS delay,  before reset called
 
 // No buffer mode font
 #define UC1609_ASCII_OFFSET 0x20 //0x20, ASCII character for Space
@@ -142,7 +142,7 @@ class ERM19264_UC1609 : public custom_graphics {
 
 // Functions not needed for no_buffer mode 
 #ifndef NO_BUFFER
-    virtual void drawPixel(int16_t x, int16_t y, uint16_t colour) override;
+    virtual void drawPixel(int16_t x, int16_t y, uint8_t colour) override;
      void LCDupdate(void);
      void LCDclearBuffer(void);
      void LCDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data);
@@ -163,7 +163,7 @@ class ERM19264_UC1609 : public custom_graphics {
     void LCDscroll(uint8_t bits);
     void LCDReset(void);
     void LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data);
-    uint16_t LCDreadStatus();
+    void LCDPowerDown(void);
            
   private:
 

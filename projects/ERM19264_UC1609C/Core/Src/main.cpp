@@ -316,7 +316,7 @@ void display_Left(MultiBuffer* targetbuffer)
   mylcd.setCursor(0, 40);
 
   mylcd.setCursor(0, 50);
-  mylcd.print("V 1.1.0");
+  mylcd.print("V 1.3.0");
   mylcd.drawFastVLine(92, 0, 63, FOREGROUND);
   mylcd.LCDupdate();
 }

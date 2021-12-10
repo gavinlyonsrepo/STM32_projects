@@ -224,15 +224,15 @@ int main(void)
 
   while (1)
   {
-	  // Method (1) Lcd bitmap method, Any buffer  setting on , buffer must BE in PROGMEM
+	  // Method (1) Lcd bitmap method, Any buffer  setting on
 	    //  x ,y,w,h, bitmap
 
-	  /*
+
 	    mylcd.LCDBitmap(0, 0 , 192, 64, fullscreenBitmap);
 	    HAL_Delay(5000);
 	    mylcd.LCDFillScreen(0x00, 0); // Clear the screen
 
-	    // Method (2) Lcd buffer method , MULTI_BUFFER or SINGLE BUFFER setting, on , buffer must NOT BE in PROGMEM
+	    // Method (2) Lcd buffer method , MULTI_BUFFER or SINGLE BUFFER setting, on
 	    //  x ,y,w,h, bitmap
 
 
@@ -241,7 +241,7 @@ int main(void)
 	    HAL_Delay(5000);
 	    mylcd.LCDFillScreen(0x00, 0); // Clear the s
 
-	    //   Method (3) mutlibuffer mode  , MULTI_BUFFER setting on, NOTE  buffer must not be in PROGMEM
+	    //   Method (3) muliibuffer mode  , MULTI_BUFFER setting on,
 
 
 	      MultiBuffer Whole_screen;
@@ -255,14 +255,14 @@ int main(void)
 	      HAL_Delay(5000);
 	      mylcd.LCDFillScreen(0x00, 0);
 
-		*/
-	    //   Method  (4) singlebuffer method, SINGLE_BUFFER  setting on, NOTE  buffer must not be in PROGMEM
 
+	    //   Method  (4) singlebuffer method, SINGLE_BUFFER  setting on, NOTE  buffer must not be in PROGMEM
+	  	 /*
 	      mylcd.buffer = (uint8_t*) &fullscreenBitmap;
 	      mylcd.LCDupdate();
 	      HAL_Delay(5000);
 	   	  mylcd.LCDFillScreen(0x00, 0);
-
+		*/
 	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
