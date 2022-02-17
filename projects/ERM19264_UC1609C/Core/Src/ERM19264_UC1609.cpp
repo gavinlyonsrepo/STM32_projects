@@ -113,13 +113,6 @@ void ERM19264_UC1609::LCDEnable (uint8_t bits)
 //Setting SL outside of this range causes undefined effect on the displayed
 //image.
 // Param1: bits 0-64 line number y-axis
-void ERM19264_UC1609::LCDscroll (uint8_t bits) 
-{
- UC1609_CS_SetLow;
-  send_command(UC1609_SCROLL, bits);
- UC1609_CS_SetHigh;
-}
-
 // Desc: Rotates the display 
 // Set LC[2:1] for COM (row) mirror (MY), SEG (column) mirror (MX).
 // Param1: 4 possible values 000 010 100 110 (defined)
@@ -141,6 +134,13 @@ void ERM19264_UC1609::LCDrotate(uint8_t rotatevalue)
 
 // Desc: invert the display
 // Param1: bits, 1 invert , 0 normal
+void ERM19264_UC1609::LCDscroll (uint8_t bits)
+{
+ UC1609_CS_SetLow;
+  send_command(UC1609_SCROLL, bits);
+ UC1609_CS_SetHigh;
+}
+
 void ERM19264_UC1609::invertDisplay (uint8_t bits) 
 {
  UC1609_CS_SetLow;
@@ -258,6 +258,24 @@ void ERM19264_UC1609::send_data(uint8_t data)
 // ******************************************************
 // Functions below not & needed for no_buffer mode 
 #ifndef NO_BUFFER
+
+// Desc init the Multibuffer struct
+// Param 1 Pointer to a struct
+// Param 2 Pointer to buffer array data(arrays decay to  pointers)
+// Param 3. width of buffer
+// Param 4. height of buffer
+// Param 5. x offset of buffer
+// Param 6. y offset of buffer
+#ifdef MULTI_BUFFER
+void ERM19264_UC1609::LCDinitBufferStruct(MultiBuffer* mystruct, uint8_t* mybuffer, uint8_t w,  uint8_t h, int16_t  x, int16_t y)
+{
+   mystruct->screenbitmap = mybuffer; // point it to the buffer
+   mystruct->width = w ;
+   mystruct->height = h;
+   mystruct->xoffset = x;
+   mystruct->yoffset = y;
+}
+#endif
 
 //Desc: updates the buffer i.e. writes it to the screen
 void ERM19264_UC1609::LCDupdate() 

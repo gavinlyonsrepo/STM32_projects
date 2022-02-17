@@ -3,10 +3,11 @@
 // Example file name : main.cpp
 // Description:
 // Test file for ERM19264_UC1609_library,
-// multi buffer mode. Misc functions
+// Multi-buffer mode , graphics
 // *****************************
 // NOTES :
-// (1) This is for software SPI 
+// (1) This is for hard
+* ware SPI
 // ******************************
  */
 
@@ -52,18 +53,15 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
+void  DisplayGraphics(MultiBuffer* targetBuffer);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-ERM19264_UC1609  mylcd(false);
-uint16_t count  = 0;
+ERM19264_UC1609  mylcd(true);
 #define VbiasPOT 0x49 //Constrast 00 to FE , 0x49 is default. user adjust
-#define mylcdheight 64
-#define mylcdwidth  192
-#define DisplayDelay1 5000
-#define DisplayDelay2 0
+#define MYLCDHEIGHT 64
+#define MYLCDWIDTH  192
 /* USER CODE END 0 */
 
 /**
@@ -109,102 +107,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   HAL_GPIO_WritePin(GPIOA, LD2_Pin,GPIO_PIN_SET);
   strcpy((char*)buf,"Start\r\n");
+
   HAL_UART_Transmit(&huart2, buf, strlen((char*)buf),HAL_MAX_DELAY ); //baud 38400
 
 
   while (1)
   {
-	  // Define a full screen buffer and struct
-	   uint8_t  screenBuffer[1537];
+	  // Define a full screen buffer
+	  uint8_t fullscreenBuffer[MYLCDWIDTH * (MYLCDHEIGHT / 8) + 1]; // 192 X (64/8) + 1 = 1537
 
-	   MultiBuffer whole_screen;
-	   whole_screen.screenbitmap = (uint8_t*) &screenBuffer;
-	   whole_screen.width = 192;
-	   whole_screen.height = 64;
-	   whole_screen.xoffset = 0;
-	   whole_screen.yoffset = 0;
+	   // Declare a struct
+	   MultiBuffer wholescreen;
 
-	   mylcd.ActiveBuffer =  &whole_screen; // set buffer object
-	   mylcd.LCDclearBuffer(); // clear the buffer
+	   // Define the struct varibles
+		MultiBuffer MyStruct;
+		mylcd.LCDinitBufferStruct(&MyStruct, fullscreenBuffer, MYLCDWIDTH,
+		MYLCDHEIGHT, 0, 0);
 
-	   // Set text parameters
-	   mylcd.setTextColor(FOREGROUND);
-	   mylcd.setTextSize(2);
-
-	   // Test 1 LCD all pixels on
-	     mylcd.setCursor(20, 30);
-	     mylcd.print("All Pixels on");
-	     mylcd.LCDupdate();
-	     HAL_Delay(4000);
-	     mylcd.LCDclearBuffer();
-	     mylcd.LCDupdate();
-	     mylcd.LCD_allpixelsOn(1);
-	     HAL_Delay(2000);
-	     mylcd.LCD_allpixelsOn(0);
-	     HAL_Delay(2000);
-
-	     // Test 2 inverse
-	     mylcd.setCursor(20, 30);
-	     mylcd.print("inverse test  ");
-	     mylcd.LCDupdate();
-	     mylcd.invertDisplay(0); // Normal
-	     HAL_Delay(2000);
-	     mylcd.invertDisplay(1); // Inverted
-	     HAL_Delay(4000);
-	     mylcd.invertDisplay(0);
-
-
-	     // Test3 LCD rotate
-	     mylcd.LCDclearBuffer();
-	     mylcd.setCursor(20, 30);
-	     mylcd.print("rotate test");
-	     mylcd.LCDupdate();
-	     HAL_Delay(2000);
-	     mylcd.LCDrotate(UC1609_ROTATION_FLIP_ONE);
-	     mylcd.LCDupdate();
-	     HAL_Delay(5000);
-	     mylcd.LCDrotate(UC1609_ROTATION_FLIP_TWO);
-	     mylcd.LCDupdate();
-	     HAL_Delay(5000);
-	     mylcd.LCDrotate(UC1609_ROTATION_FLIP_THREE);
-	     mylcd.LCDupdate();
-	     HAL_Delay(5000);
-	     mylcd.LCDrotate(UC1609_ROTATION_NORMAL);
-	     mylcd.LCDupdate();
-	     HAL_Delay(5000);
-
-
-	   // Test4 LCD scroll
-	   mylcd.LCDclearBuffer();
-	   //mylcd.LCDupdate();
-	   mylcd.setCursor(0, 40);
-	   mylcd.print("scroll test");
-	   for (uint8_t i = 0 ; i < 62 ; i ++)
-	   {
-	     mylcd.LCDscroll(i);
-	     mylcd.LCDupdate();
-	     HAL_Delay(50);
-	   }
-	   mylcd.LCDscroll(0);
-
-	   //Test5 LCD enable and disable
-	   mylcd.LCDclearBuffer();
-	   mylcd.setCursor(0, 30);
-	   mylcd.print("LCD Disable test");
-	   mylcd.LCDupdate();
-	   HAL_Delay(5000);
-	   mylcd.LCDEnable(0);
-	   HAL_Delay(5000);
-	   mylcd.LCDEnable(1);
-	   mylcd.LCDclearBuffer();
-	   mylcd.setCursor(20, 30);
-	   mylcd.print("End");
-	   mylcd.LCDupdate();
-
-	   while (1)
-	   {
-	     HAL_Delay(1); // tests over, loop here forever
-	   }
+	   // Call a function to display graphics pass it the struct
+	   DisplayGraphics(&MyStruct);
 	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -361,8 +282,47 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-// Function to display left hand side buffer
+// Function to display Graphics.
+void  DisplayGraphics(MultiBuffer* targetBuffer)
+{
+  //Q1 |Q2
+  //-----
+  //Q3 | Q4
+  //
+  bool colour = 1;
+  mylcd.ActiveBuffer =  targetBuffer;   // Set the buffer struct object
+  mylcd.LCDclearBuffer(); // Clear the buffer
+  while (1)
+  {
+    colour = !colour;
 
+    // Draw the X
+    mylcd.drawLine(96,  0, 96, 64, FOREGROUND);
+    mylcd.drawFastVLine(94, 0, 64, FOREGROUND);
+    mylcd.drawFastHLine(0, 32, 192, FOREGROUND);
+
+    //Q1
+    mylcd.fillRect(0, 10, 20, 20, colour);
+    mylcd.fillCircle(40, 20, 10, FOREGROUND);
+    mylcd.fillTriangle(60, 30, 70, 10, 80, 30, !colour);
+    //Q2
+    mylcd.drawRect(100, 10, 20, 20, FOREGROUND);
+    mylcd.drawCircle(140, 20, 10, colour);
+    mylcd.drawTriangle(160, 30, 170, 10, 180, 30, FOREGROUND);
+    //Q3
+    mylcd.fillRoundRect(0, 40, 40, 20, 10, !colour);
+    mylcd.fillRoundRect(45, 40, 40, 20, 10, colour);
+    //Q4
+    char i;
+    for (i = 0; i < 10; i ++)
+    {
+      mylcd.drawRect(100 + i, 40 + i, 80 - i * 2, 20 - i * 2, FOREGROUND);
+      mylcd.LCDupdate();
+      HAL_Delay(50);
+    }
+    mylcd.LCDclearBuffer();
+  }
+}
 /* USER CODE END 4 */
 
 /**

@@ -14,3 +14,6 @@
 * Dec 2021 
 	* AHT10 Sensor library added 
 	* LM75A Sensor library added
+
+* Feb 2022 
+	* Upgrade ERM19264_UC1609C library to version 1.4

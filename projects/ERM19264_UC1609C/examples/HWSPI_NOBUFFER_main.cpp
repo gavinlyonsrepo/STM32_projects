@@ -7,6 +7,7 @@
 // *****************************
 // NOTES :
 // (1) This is for hardware SPI. 
+// (2) no buffer mode must be selected in llibrary header file
 // ******************************
  */
  

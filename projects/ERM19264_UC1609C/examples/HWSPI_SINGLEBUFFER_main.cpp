@@ -7,6 +7,7 @@
 // *****************************
 // NOTES :
 // (1) This is for hardware SPI. 
+// (2) Single buffer mode must be selected in llibrary header fil
 // ******************************
  */
 

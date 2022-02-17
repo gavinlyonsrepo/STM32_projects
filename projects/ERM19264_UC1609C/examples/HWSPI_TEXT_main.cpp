@@ -3,10 +3,12 @@
  // Example file name : main.cpp
  // Description:
  // Test file for ERM19264_UC1609_library,
- // multi buffer mode. 
+ // multi buffer mode. Text/fonts example
  // *****************************
  // NOTES :
- // (1) This is for software SPI
+ (1) hardware SPI
+ (2) test 7 8 9 require the repsective fonts commented in
+ custom_graphics_font.h file FONT DEFINE SECTION
  // ******************************
  */
 
@@ -50,14 +52,14 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-void display_Right(MultiBuffer *targetbuffer);
-void display_Left(MultiBuffer *targetbuffer);
+void DisplayText(MultiBuffer *targetBuffer);
+void TestReset(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-ERM19264_UC1609 mylcd(false);
-uint16_t count = 0;
+ERM19264_UC1609 mylcd(true);
 #define VbiasPOT 0x49 //Constrast 00 to FE , 0x49 is default. user adjust
 #define MYLCDHEIGHT 64
 #define MYLCDWIDTH  192
@@ -105,32 +107,19 @@ int main(void) {
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
+	// Optional
 	HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_SET);
 	strcpy((char*) buf, "Start\r\n");
 	HAL_UART_Transmit(&huart2, buf, strlen((char*) buf), HAL_MAX_DELAY); //baud 38400
 
 	while (1) {
+		uint8_t fullScreenBuffer[MYLCDWIDTH * (MYLCDHEIGHT / 8) + 1] ;
+		MultiBuffer MyStruct;
+		mylcd.LCDinitBufferStruct(&MyStruct, fullScreenBuffer, MYLCDWIDTH,
+		MYLCDHEIGHT, 0, 0);
 
-		mylcd.setTextColor(FOREGROUND);
-		mylcd.setTextSize(1);
-		// Define a half screen sized buffer
-		uint8_t screenBuffer[(MYLCDWIDTH * (MYLCDHEIGHT / 8)) / 2]; // 1536/2 = 768 bytes
-
-		MultiBuffer left_side; // Declare a multi buffer struct for left side of screen
-		// Intialise that struct (&struct, buffer, w, h, x_offset, y-offset)
-		mylcd.LCDinitBufferStruct(&left_side, screenBuffer, MYLCDWIDTH / 2,
-				MYLCDHEIGHT, 0, 0);
-
-		MultiBuffer right_side; // Declare a multi buffer struct for right side of screen
-		// Intialise that struct (&struct, buffer, w, h, x_offset, y-offset)
-		mylcd.LCDinitBufferStruct(&right_side, screenBuffer, MYLCDWIDTH / 2,
-				MYLCDHEIGHT, MYLCDWIDTH / 2, 0);
-
-		display_Left(&left_side);
-
-		display_Right(&right_side);
-		count++;
-		HAL_Delay(1);
+		// Call a function to display text
+		DisplayText(&MyStruct);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -280,45 +269,129 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
-// Function to display left hand side buffer
-void display_Left(MultiBuffer *targetbuffer) {
-	mylcd.ActiveBuffer = targetbuffer; // set target buffer object
-	mylcd.LCDclearBuffer();
-	mylcd.setCursor(0, 0);
-	mylcd.print("Left Buffer:");
+// A series of tests to display the text mode
+// Test 1 Font size 3 string
+// Test 2 font size 2 string
+// Test 3 font size 1 string inverted
+// Test 4 draw a single character font size 4
+// Test 5 print ASCII  font 0-127
+// Test 6 print ASCII font 128-255.
+// Test 7 print font 2 3 4
+// Test 8 print font 5 big num
+// Test 9 print font 6 med num
+void DisplayText(MultiBuffer *targetBuffer) {
+	char myString[9] = { '1', '3', ':', '2', '6', ':', '1', '8' };
+	mylcd.setTextWrap(true);
+	mylcd.ActiveBuffer = targetBuffer;
+	mylcd.LCDclearBuffer(); // Clear the buffer
 
-	mylcd.setCursor(0, 10);
-	mylcd.print("96 * 64/8 = 768");
+	while (1) {
+		// Test 1
+		mylcd.setFontNum(UC1609Font_Default);
+		mylcd.setTextColor(FOREGROUND);
+		mylcd.setTextSize(3);
+		mylcd.setCursor(0, 0);
+		mylcd.print("345.897");
 
-	mylcd.setCursor(0, 20);
-	mylcd.print("x * y/8 = 768");
+		// Test 2
+		mylcd.setTextSize(2);
+		mylcd.setCursor(0, 30);
+		mylcd.print("1234567890");
 
-	mylcd.setCursor(0, 30);
-	mylcd.print(count);
+		// Test 3
+		mylcd.setTextSize(1);
+		mylcd.setTextColor(BACKGROUND, FOREGROUND);
+		mylcd.setCursor(0, 50);
+		mylcd.print("HelloWorld");
 
-	mylcd.setCursor(0, 40);
-	mylcd.print("SW SPI");
-	mylcd.setCursor(0, 50);
-	mylcd.print("V 1.4.0");
-	mylcd.drawFastVLine(92, 0, 63, FOREGROUND);
-	mylcd.LCDupdate();
+		// Test 4
+		mylcd.drawChar(150, 25, 'H', FOREGROUND, BACKGROUND, 4);
+
+		TestReset();
+
+		// Test 5
+		mylcd.setCursor(0, 0);
+		mylcd.setTextColor(FOREGROUND);
+		mylcd.setTextSize(1);
+		mylcd.print("ASCII font 0-127");
+		mylcd.setCursor(0, 15);
+		// Print first 127 chars of font
+		for (char i = 0; i < 126; i++) {
+			if (i == '\n' || i == '\r')
+				continue;
+			mylcd.print(i);
+			HAL_Delay(DisplayDelay2);
+		}
+		TestReset();
+
+		// Test 6,
+		mylcd.setCursor(0, 0);
+		mylcd.setTextColor(FOREGROUND);
+		mylcd.setTextSize(1);
+		mylcd.print("ASCII font 128-255");
+
+		uint8_t x = 0;
+		uint8_t y = 15;
+		mylcd.setCursor(x, y);
+
+		for (uint8_t i = 128; i < 255; i++) {
+			if (x > 180) {
+				x = 0;
+				y += 9;
+			}
+			mylcd.drawChar(x, y, i, FOREGROUND, BACKGROUND, 1);
+			x += 7;
+			HAL_Delay(DisplayDelay2);
+		}
+
+		TestReset();
+
+		// Test 7  fonts 2-4
+		mylcd.setTextSize(2);
+
+		mylcd.setFontNum(UC1609Font_Thick);
+		mylcd.setCursor(0, 0);
+		mylcd.print("THICK");
+
+		mylcd.setFontNum(UC1609Font_Seven_Seg);
+		mylcd.setCursor(0, 20);
+		mylcd.print("3354610");
+
+		mylcd.setFontNum(UC1609Font_Wide);
+		mylcd.setCursor(0, 40);
+		mylcd.print("WIDE");
+
+		TestReset();
+
+		// Test 8 font 5
+		mylcd.setFontNum(UC1609Font_Bignum);
+		mylcd.setTextColor(FOREGROUND, BACKGROUND);
+		mylcd.setCursor(80, 0);
+		mylcd.print(859);
+		mylcd.drawTextNumFont(0, 32, myString, BACKGROUND, FOREGROUND); //7b drawTextNumFont , 13:26:18 inverted
+		mylcd.drawCharNumFont(0, 0, '8', FOREGROUND, BACKGROUND); // 7c drawCharNumFont
+		mylcd.drawCharNumFont(160, 0, '4', BACKGROUND, FOREGROUND); // 7d drawCharNumFont inverted
+
+		TestReset();
+
+		// Test 9 font 6
+		mylcd.setFontNum( UC1609Font_Mednum);
+		mylcd.setCursor(80, 0);
+		mylcd.print(993);
+		mylcd.drawTextNumFont(0, 32, myString, BACKGROUND, FOREGROUND); // 8b drawTextNumFont , 13:26:18 inverted
+		mylcd.drawCharNumFont(0, 0, '6', FOREGROUND, BACKGROUND); // 8c drawCharNumFont
+		mylcd.drawCharNumFont(160, 0, '6', BACKGROUND, FOREGROUND); // 8d drawCharNumFont inverted
+
+		TestReset();
+
+	} // while
 }
 
-// Function to display right hand side buffer
-void display_Right(MultiBuffer *targetbuffer) {
-	mylcd.ActiveBuffer = targetbuffer; // set target buffer object
+void TestReset(void) {
+	mylcd.LCDupdate();  // Write to the buffer
+	HAL_Delay(DisplayDelay1);
 	mylcd.LCDclearBuffer();
-	mylcd.setCursor(0, 0);
-	mylcd.print("Right buffer:");
-
-	mylcd.fillRect(0, 10, 20, 20, FOREGROUND);
-	mylcd.fillCircle(40, 20, 10, FOREGROUND);
-	mylcd.fillTriangle(60, 30, 70, 10, 80, 30, FOREGROUND);
-	mylcd.drawRoundRect(10, 40, 60, 20, 10, FOREGROUND);
-
-	mylcd.LCDupdate();
 }
-
 /* USER CODE END 4 */
 
 /**

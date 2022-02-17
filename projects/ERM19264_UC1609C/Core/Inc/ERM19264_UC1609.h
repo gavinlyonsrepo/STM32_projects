@@ -132,6 +132,7 @@ class ERM19264_UC1609 : public custom_graphics {
 
 #ifdef MULTI_BUFFER
    MultiBuffer* ActiveBuffer;
+   void LCDinitBufferStruct(MultiBuffer *p, uint8_t* mybuffer, uint8_t w,  uint8_t h, int16_t  x, int16_t y);
 #endif
 
 #ifdef SINGLE_BUFFER
@@ -152,7 +153,7 @@ class ERM19264_UC1609 : public custom_graphics {
      void  LCDNoBufferString(const unsigned char *characters);
 #endif
     
-    void LCDbegin(uint8_t, SPI_HandleTypeDef * );
+    void LCDbegin(uint8_t contrast, SPI_HandleTypeDef * );
     void LCDinit(void);
     void LCDEnable(uint8_t on);
     void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
