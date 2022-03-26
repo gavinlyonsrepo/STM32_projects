@@ -11,7 +11,6 @@ Overview
 3. ASCII strings and character text display.
 4. Nine ASCII text fonts.
 5. Sleep mode.
-6. Designed to be light weight, low memory footprint. 
 
 * Author: Gavin Lyons
 
@@ -26,9 +25,7 @@ This a port of these libraries, full details at link.
 
 PIC X8 library [LINK](https://github.com/gavinlyonsrepo/pic_18F47K42_projects/tree/master/projects/nokiatext)
 
-Arduino library (truncated no HW SPI here) at [LINK](https://github.com/gavinlyonsrepo/NOKIA5110_TEXT)
-
-
+Arduino library at [LINK](https://github.com/gavinlyonsrepo/NOKIA5110_TEXT)
 
 Connections
 ------------------------------

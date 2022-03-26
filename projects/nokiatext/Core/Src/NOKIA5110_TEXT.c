@@ -3,23 +3,25 @@
  * File: NOKIA5110_TEXT.c
  * Description: Nokia library c file
  * Author: Gavin Lyons.
- * IC: PIC_18F47K42 
- * IDE:  MPLAB 5.30 Xc8 2.10
- * Created March 2019
  * Description: See URL for full details.
- * URL: https://github.com/gavinlyonsrepo/pic_18F47K42_projects
+ * URL: https://github.com/gavinlyonsrepo/STM32_projects
  */
 
 #include "NOKIA5110_TEXT.h"
 #include "main.h"
+#include  "NOKIA5110_TEXT_FONT_DATA.h"
 
 uint8_t _contrast = LCD_CONTRAST;
-uint8_t _FontNumber = LCD_FONTNUMBER;
 uint8_t _bias = LCD_BIAS;
 bool _sleep = false;
 bool _inverse = false;
 uint8_t _Block = 0;
 uint8_t _Col = 0;
+
+uint8_t	_CurrentFontNumber = LCDFont_Default;
+uint8_t _CurrentFontWidth =  5;
+uint8_t _CurrentFontOffset = 0x20 ;
+
 
 /*Function : LCDinit
 This sends the  commands to the PCD8544 to  init LCD
@@ -49,11 +51,66 @@ void LCDInit(bool Inverse, uint8_t Contrast, uint8_t Bias) {
 }
 
 /* Function: LCDFont
-Passed a int to set between fonts , 1-6
-default font is 1, Font_two is 2. Font_three is 3 etc
+Passed a enum to set between fonts , 1-9
  */
-void LCDFont(uint8_t FontNumber) {
-    _FontNumber = FontNumber;
+void LCDFont(LCDFontType_e FontNumber) {
+
+	typedef enum {
+		LCDFont_W_3 = 3, // tiny font
+		LCDFont_W_4 = 4, // seven segment font
+		LCDFont_W_5 = 5, // Default
+		LCDFont_W_7 = 7, // thick + homeSpun
+		LCDFont_W_8 = 8, // wide
+		LCDFont_W_12 = 12, // large , no lowercase letters
+		LCDFont_W_16 = 16 // mega and huge , numbers only
+	} LCDFontWidth_e; // Size width of fonts in pixels, add padding for font_width < 9
+
+	typedef enum {
+		LCDFont_O_Full = 0x00, //   full ASCII
+		LCDFont_O_Space = 0x20, // Starts at Space
+		LCDFont_O_Number = 0x2E, // // ASCII code for . is 0X2E (. / 0 1 etc)
+	} LCDFontOffset_e; // font offset in the ASCII table
+
+		LCDFontOffset_e offsetFont;
+		LCDFontWidth_e  widthFont;
+
+		_CurrentFontNumber = FontNumber;
+
+			switch (_CurrentFontNumber) {
+			case LCDFont_Default:  // default
+				_CurrentFontWidth = (widthFont = LCDFont_W_5);
+				_CurrentFontOffset =  ( offsetFont =  LCDFont_O_Space );
+			break;
+			case LCDFont_Thick: // Thick
+			case LCDFont_HomeSpun:  // homespun
+				_CurrentFontWidth = (widthFont = LCDFont_W_7);
+				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+			break;
+			case LCDFont_Seven_Seg:  //seven seg
+				_CurrentFontWidth = (widthFont = LCDFont_W_4);
+				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+			break;
+			case LCDFont_Wide :  //wide
+				_CurrentFontWidth = (widthFont = LCDFont_W_8);
+				_CurrentFontOffset =   ( offsetFont = LCDFont_O_Space);
+			break;
+			case LCDFont_Tiny : // tiny
+				_CurrentFontWidth = (widthFont = LCDFont_W_3);
+				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+			break;
+			case LCDFont_Large : // large
+				_CurrentFontWidth = (widthFont = LCDFont_W_12);
+				_CurrentFontOffset = ( offsetFont = LCDFont_O_Space);
+			break;
+			case LCDFont_Huge: // huge
+				_CurrentFontWidth = (widthFont = LCDFont_W_16);
+				_CurrentFontOffset =  ( offsetFont =LCDFont_O_Number );
+			break;
+			case LCDFont_Mega: // mega
+				_CurrentFontWidth = (widthFont = LCDFont_W_16);
+				_CurrentFontOffset =  ( offsetFont =LCDFont_O_Number ) ;
+			break;
+		}
 }
 
 /* Function: LCDClear 
@@ -111,25 +168,15 @@ void LCDWrite(unsigned char data_or_command, unsigned char data) {
     LCD_CE_SetHigh();
 }
 
-/* Function: LCDCharacter.
- This function takes in a character, looks it up in the font table/array
-And writes it to the screen
-Each character is 8 bits tall and 5 bits wide. We pad one blank column of
-pixels on each side of the character for readability.
- */
+/* Function: LCDCharacter.*/
 void LCDCharacter(char character) {
-    switch (_FontNumber) {
-        case 1: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_1);
-            break;
-        case 2: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_2);
-            break;
-        case 3: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_3);
-            break;
-        case 4: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_4);
-            break;
-        case 5: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_5);
-            break;
-        case 6: LCDdraw_fonts_1TO6(character, LCD_FONT_WIDTH_6);
+    switch (_CurrentFontNumber) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6: LCDdraw_fonts_1TO6(character);
             break;
         case 7: LCDdraw_fonts_7(character);
             break;
@@ -198,17 +245,17 @@ void LCDdisableSleep() {
  Write a custom character to screen X by Y. Y is fixed at 8
  Parameters 1 Example: 5 by 8 = || || = Char array unsigned char power[5] = {0xFF, 0xFF, 0x00, 0xFF, 0xFF}; 
  Parameters 2: Size of array,  sizeof(power)/sizeof(unsigned char)
- Parameter 3: Blank vertical line padding  padding 4 values
+ Parameter 3: Blank vertical line padding  padding 4 values enum
  0 = no padding 
  1 = Left hand side padding only
  2 = Right hand side padding only 
  3 = LHS + RHS
 
  */
-void LCDCustomChar(const unsigned char character[], uint16_t numChars, uint8_t padding) {
+void LCDCustomChar(const unsigned char character[], uint16_t numChars, LCDPaddingType_e padding) {
 
     uint16_t column = 0; // max 504 bytes.
-    if (padding == 1 || padding == 3) {
+    if (padding == LCDPadding_LHS || padding == LCDPadding_Both) {
         LCDWrite(LCD_DATA, 0x00); //Blank vertical line padding , LHS
     }
 
@@ -216,72 +263,74 @@ void LCDCustomChar(const unsigned char character[], uint16_t numChars, uint8_t p
         LCDWrite(LCD_DATA, character[column]); //pgm TODO
     }
 
-    if (padding == 2 || padding == 3) {
+    if (padding == LCDPadding_RHS || padding == LCDPadding_Both) {
         LCDWrite(LCD_DATA, 0x00); //Blank vertical line padding RHS
     }
 }
 
-void LCDdraw_fonts_1TO6(char character, uint8_t font_width) {
+void LCDdraw_fonts_1TO6(char character) {
     LCDWrite(LCD_DATA, 0x00); //Blank vertical line padding , LHS
-    for (uint8_t column = 0; column < font_width; column++) {
-        switch (_FontNumber) {
-            case 1:
-                #ifdef NOKIA5110_FONT_1
-                      LCDWrite(LCD_DATA, ASCII_ONE[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-            case 2:
-                #ifdef NOKIA5110_FONT_2
-                     LCDWrite(LCD_DATA, ASCII_TWO[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-            case 3:
-                #ifdef NOKIA5110_FONT_3
-                     LCDWrite(LCD_DATA, ASCII_THREE[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-            case 4:
-                #ifdef NOKIA5110_FONT_4
-                    LCDWrite(LCD_DATA, ASCII_FOUR[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-            case 5:
-                #ifdef NOKIA5110_FONT_5
-                    LCDWrite(LCD_DATA, ASCII_FIVE[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-            case 6:
-                #ifdef NOKIA5110_FONT_6
-                   LCDWrite(LCD_DATA, ASCII_SIX[character - LCD_ASCII_OFFSET][column]);
-                #endif
-            break;
-        }
-    }
-    LCDWrite(LCD_DATA, 0x00); //Blank vertical line padding RHS
+	for (uint8_t  column = 0 ; column < _CurrentFontWidth ; column++)
+	{
+		switch(_CurrentFontNumber)
+		{
+		case LCDFont_Default:
+		#ifdef NOKIA5110_FONT_Default
+			LCDWrite(LCD_DATA, FontDefault[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		case LCDFont_Thick:
+		#ifdef NOKIA5110_FONT_Thick
+			LCDWrite(LCD_DATA, FontThick[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		case LCDFont_HomeSpun:
+		#ifdef NOKIA5110_FONT_HomeSpun
+			LCDWrite(LCD_DATA, FontHomeSpun[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		case LCDFont_Seven_Seg:
+		#ifdef  NOKIA5110_FONT_SevenSeg
+			LCDWrite(LCD_DATA, FontSevenSegment[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		case LCDFont_Wide:
+		#ifdef NOKIA5110_FONT_Wide
+			LCDWrite(LCD_DATA, FontWide[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		case LCDFont_Tiny:
+		#ifdef NOKIA5110_FONT_Tiny
+			LCDWrite(LCD_DATA, FontTiny[character - _CurrentFontOffset][column]);
+		#endif
+		break;
+		}
+	}
+	LCDWrite(LCD_DATA, 0x00); // Blank vertical line padding RHS
 }
 
 void LCDdraw_fonts_7(char character) {
-#ifdef NOKIA5110_FONT_7
+#ifdef NOKIA5110_FONT_Large
     uint16_t totalchar = 0;
     uint8_t topchar = 0;
     uint8_t botchar = 0;
     uint8_t column = 0;
     //print upper byte
-    for (column = 0; column < LCD_FONT_WIDTH_7; column++) {
-        totalchar = ASCII_SEVEN[character - LCD_ASCII_OFFSET][column];
+    for (column = 0; column < _CurrentFontWidth; column++) {
+        totalchar = FontLarge[character - _CurrentFontOffset][column];
         topchar = totalchar & 0x00FF;
         LCDWrite(LCD_DATA, topchar);
     }
     //Move to next block
     LCDgotoXY(_Col, _Block + 1);
     //print lowerbyte
-    for (column = 0; column < LCD_FONT_WIDTH_7; column++) {
-        totalchar = ASCII_SEVEN[character - LCD_ASCII_OFFSET][column];
+    for (column = 0; column < _CurrentFontWidth; column++) {
+        totalchar = FontLarge[character - _CurrentFontOffset][column];
         botchar = (totalchar >> 8) & 0xFF;
         LCDWrite(LCD_DATA, botchar);
     }
     //move back to upper block  
-    LCDgotoXY(_Col + LCD_FONT_WIDTH_7, _Block - 1);
+    LCDgotoXY(_Col + _CurrentFontWidth, _Block - 1);
 #endif
 }
 
@@ -299,14 +348,14 @@ void LCDdraw_fonts_8TO9(char character) {
     uint8_t lowerbyte = 0;
     uint8_t column = 0;
     //print upper byte  DD
-    for (column = 0; column < LCD_FONT_WIDTH_8; column++) {
-        if (_FontNumber == 8) {
-        #ifdef NOKIA5110_FONT_8
-            totaldata = ASCII_EIGHT[character - LCD_ASCII_OFFSET_ZERO][column];
+    for (column = 0; column < _CurrentFontWidth; column++) {
+        if (_CurrentFontNumber == LCDFont_Huge) {
+        #ifdef NOKIA5110_FONT_Huge
+            totaldata = FontHuge[character - _CurrentFontOffset][column];
         #endif
         } else {
-            #ifdef NOKIA5110_FONT_9
-            totaldata = ASCII_NINE[character - LCD_ASCII_OFFSET_ZERO][column];
+            #ifdef NOKIA5110_FONT_Mega
+            totaldata = FontMega[character - _CurrentFontOffset][column];
             #endif
         }
         topbyte = totaldata & 0xFF;
@@ -316,14 +365,14 @@ void LCDdraw_fonts_8TO9(char character) {
     LCDgotoXY(_Col, _Block + 1); //goto next block
 
     // print middle upper byte CC
-    for (column = 0; column < LCD_FONT_WIDTH_8; column++) {
-        if (_FontNumber == 8) {
-            #ifdef NOKIA5110_FONT_8
-            totaldata = ASCII_EIGHT[character - LCD_ASCII_OFFSET_ZERO][column];
+    for (column = 0; column < _CurrentFontWidth; column++) {
+        if (_CurrentFontNumber == LCDFont_Huge) {
+            #ifdef NOKIA5110_FONT_Huge
+            totaldata = FontHuge[character - _CurrentFontOffset][column];
             #endif
         } else {
-            #ifdef NOKIA5110_FONT_9
-            totaldata = ASCII_NINE[character - LCD_ASCII_OFFSET_ZERO][column];
+            #ifdef NOKIA5110_FONT_Mega
+            totaldata = FontMega[character - _CurrentFontOffset][column];
             #endif
         }
         middleupperbyte = (totaldata >> 8) & 0xFF;
@@ -333,14 +382,14 @@ void LCDdraw_fonts_8TO9(char character) {
     LCDgotoXY(_Col, _Block + 1); //goto next block
 
     // print middle lower byte BB
-    for (column = 0; column < LCD_FONT_WIDTH_8; column++) {
-        if (_FontNumber == 8) {
-            #ifdef NOKIA5110_FONT_8
-            totaldata = ASCII_EIGHT[character - LCD_ASCII_OFFSET_ZERO][column];
+    for (column = 0; column < _CurrentFontWidth; column++) {
+        if (_CurrentFontNumber == LCDFont_Huge) {
+            #ifdef NOKIA5110_FONT_Huge
+            totaldata = FontHuge[character - _CurrentFontOffset][column];
             #endif
         } else {
-            #ifdef NOKIA5110_FONT_9
-            totaldata = ASCII_NINE[character - LCD_ASCII_OFFSET_ZERO][column];
+            #ifdef NOKIA5110_FONT_Mega
+            totaldata = FontMega[character - _CurrentFontOffset][column];
             #endif
         }
         middlelowerbyte = (totaldata >> 16) & 0xFF;
@@ -348,21 +397,21 @@ void LCDdraw_fonts_8TO9(char character) {
     }
 
     // print lower byte AA, no need if printing font 8 
-    if (_FontNumber == 8)
-        LCDgotoXY(_Col + LCD_FONT_WIDTH_8, _Block - 2); //move back for next character 
+    if (_CurrentFontNumber == LCDFont_Huge)
+        LCDgotoXY(_Col + _CurrentFontWidth, _Block - 2); //move back for next character
     else {
         totaldata = 0;
         LCDgotoXY(_Col, _Block + 1); //goto next block
-        for (column = 0; column < LCD_FONT_WIDTH_8; column++) {
-            #ifdef NOKIA5110_FONT_9
-            totaldata = ASCII_NINE[character - LCD_ASCII_OFFSET_ZERO][column];
+        for (column = 0; column < _CurrentFontWidth; column++) {
+            #ifdef NOKIA5110_FONT_Mega
+            totaldata = FontMega[character - _CurrentFontOffset][column];
             lowerbyte = (totaldata >> 24) & 0xFF;
             LCDWrite(LCD_DATA, lowerbyte);
             #endif
         }
-        LCDgotoXY(_Col + LCD_FONT_WIDTH_8, _Block - 3); //move back for next character 
+        LCDgotoXY(_Col + _CurrentFontWidth, _Block - 3); //move back for next character
     }
-
+    character += lowerbyte; // Get rid of unused variable warning
 }
 
 bool LCDIsSleeping() {
@@ -375,4 +424,27 @@ void LCDFillBlock(uint8_t FillData, uint8_t RowBlockNum) {
         LCDWrite(LCD_DATA, FillData);
     }
 }
+
+// Func Desc: vsprintf wrapper to print numerical data
+// Parameters: https://www.tutorialspoint.com/c_standard_library/c_function_vsprintf.htm
+// The C library function int vsprintf(char *str, const char *format, va_list arg)
+// sends formatted output to a string using an argument list passed to it.
+// Returns: If successful, the total number of characters written is returned,
+// otherwise a negative number is returned.
+// Note: requires stdio.h and stdarg.h libraries
+
+int LCDPrintf(const char *fmt, ...) {
+    int length;
+    char buffer[100];
+    va_list ap;
+
+    va_start(ap, fmt);
+    length = vsprintf(buffer, fmt, ap);
+    va_end(ap);
+    if (length > 0) {
+        LCDString(buffer);
+    }
+    return length;
+}
+
 /* =========== EOF ===========*/

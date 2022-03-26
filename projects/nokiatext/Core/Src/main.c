@@ -54,10 +54,11 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void NokiaSetup(void);
-void TestLoop(void); // Generl tests, default font , clear and fill , draw, custom char
-void TestTwoLoop(void); // For testing fonts 1-6  Comment in  defines at top of  NOKIA5110_TEXT.h if using non default
-void TestThreeLoop(void); // for testing fonts 7-9
-void TestFourLoop(void); // bitmap test
+void TestPrint(void);
+void TestGeneral(void); // General tests, default font , clear and fill , draw, custom char
+void TestFont1to6(void); // For testing fonts 1-6  Comment in  defines at top of  NOKIA5110_TEXT.h if using non default
+void TestFont7to9(void); // for testing fonts 7-9
+void TestBitmap(void); // bitmap test
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -65,7 +66,7 @@ void TestFourLoop(void); // bitmap test
 #define myinverse  false
 #define mycontrast 0xB1 // default is 0xBF set in LCDinit, Try 0xB1 to 0xBF if your display is too dark
 #define mybias 0x13 // LCD bias mode 1:48: Try 0x12 or 0x13 or 0x14
-#define FontNumber 1 //1-9, 1 is default ,  Comment in  defines at top of  NOKIA5110_TEXT.h if using non default
+
 #define TEST_DELAY 2000
 /* USER CODE END 0 */
 
@@ -109,10 +110,11 @@ int main(void)
   {
 	  HAL_Delay(TEST_DELAY);
 
-	  TestLoop();
-      //TestTwoLoop(); // Comment in to test , read notes in function header
-      //TestThreeLoop(); //Comment in to test , read notes in function header
-      //TestFourLoop(); //Comment in to test , read notes in function header
+	  TestPrint();
+	  TestGeneral();
+	  TestFont1to6(); // Comment in to test , read notes in function header
+      TestFont7to9(); //Comment in to test , read notes in function header
+      TestBitmap(); //Comment in to test , read notes in function header
 
 	  /* USER CODE END WHILE */
 
@@ -225,12 +227,29 @@ void NokiaSetup(void)
 {
 	LCDInit(myinverse, mycontrast, mybias); // init the lCD
 	LCDClear(0x00); // Clear screen
-	LCDFont(FontNumber);
 }
 
-//****************************** TEST LOOP ONE ****************************
-// Text and  function tests
-void TestLoop(void) {
+//****************************** Test Print function ****************************
+
+void TestPrint(void)
+{
+
+	uint16_t myPosInt = 765;
+	int16_t  myNegInt = -112;
+
+	LCDgotoXY(0, 0);
+    LCDPrintf("pos num %u",myPosInt );
+
+	LCDgotoXY(0, 1);
+    LCDPrintf("neg num %d",myNegInt);
+
+    HAL_Delay(5000);
+    LCDClear(0x00);
+}
+
+// **********************************  Text and  function tests *****************
+
+void TestGeneral(void) {
     /* TESTS
      1. TEST 1a writing text to blocks
      2. TEST 1b clearing by  blocks
@@ -288,10 +307,10 @@ void TestLoop(void) {
     if (sleepmodetest == true) {
         LCDClear(0x00);
         LCDgotoXY(0, 0);
-        LCDString("Sleep 10s");
+        LCDString("Sleep 5s");
         HAL_Delay(1000);
         LCDenableSleep(); //go to sleep
-        HAL_Delay(10000);
+        HAL_Delay(5000);
         LCDdisableSleep(); //wake up
         LCDgotoXY(0, 0);
         LCDString("Awake");
@@ -308,7 +327,7 @@ void TestLoop(void) {
 
         for (uint8_t Pixels = 11; Pixels < 255; Pixels++) {
             LCDSetPixel(Pixels / 5, Pixels / 10);
-            HAL_Delay(25);
+            HAL_Delay(15);
         }
 
         // 1e Draw a horizontal line with SetPixel across screen at row 10
@@ -353,9 +372,9 @@ void TestLoop(void) {
     LCDgotoXY(0, 0);
     LCDString("Custom char");
     LCDgotoXY(40, 2);
-    LCDCustomChar(power, sizeof (power) / sizeof (unsigned char), 0x03);
+    LCDCustomChar(power, sizeof (power) / sizeof (unsigned char), LCDPadding_Both);
     LCDgotoXY(40, 4);
-    LCDCustomChar(myspeed, sizeof (myspeed) / sizeof (unsigned char), 0x03);
+    LCDCustomChar(myspeed, sizeof (myspeed) / sizeof (unsigned char), LCDPadding_Both);
     HAL_Delay(5000);
 
     //whole screen clear again
@@ -363,55 +382,49 @@ void TestLoop(void) {
     HAL_Delay(TEST_DELAY);
 }
 
-//****************************** TEST LOOP TWO ****************************
+//****************************** TestFont1to6 ****************************
 // fonts 1-6 tests,  NOTE fonts  must be  commented in header file
 
-void TestTwoLoop() {
-    uint8_t fontnumber = 1; // use Font one
+void TestFont1to6() {
+
 
     HAL_Delay(TEST_DELAY);
-    LCDFont(fontnumber); //font 1
+    LCDFont(LCDFont_Default); //font 1
     LCDgotoXY(0, 0); // (go to (X , Y) (0-84 columns, 0-5 blocks)
     LCDString("1234567890AB"); //print to block 0
     HAL_Delay(TEST_DELAY);
-    fontnumber++;
-    LCDFont(fontnumber); // font 2
+    LCDFont(LCDFont_Thick); // font 2
     LCDgotoXY(0, 1);
     LCDString("VOLTAGE 2"); //print to block 1
     HAL_Delay(TEST_DELAY);
-    fontnumber++;
-    LCDFont(fontnumber); //font 3
+    LCDFont(LCDFont_HomeSpun); //font 3
     LCDgotoXY(0, 2);
-    LCDString("ABCDEFGHIJK"); //print to block 2
+    LCDString("ABCDEFGH"); //print to block 2
     HAL_Delay(TEST_DELAY);
-    fontnumber++;
-    LCDFont(fontnumber); //font 4
+    LCDFont(LCDFont_Seven_Seg); //font 4
     LCDgotoXY(0, 3);
     LCDString("VOLTAGE 5.843"); //print to block 3
     HAL_Delay(TEST_DELAY);
-    fontnumber++;
-    LCDFont(fontnumber); //font 5
+    LCDFont(LCDFont_Wide); //font 5
     LCDgotoXY(0, 4);
     LCDString("VOLTAGE"); //print to block 4
     HAL_Delay(TEST_DELAY);
-    fontnumber++;
-    LCDFont(fontnumber); //font 6
+    LCDFont(LCDFont_Tiny); //font 6
     LCDgotoXY(0, 5); // (go to (X , Y) (0-84 columns, 0-5 blocks)
     LCDString("1234567890123456"); //print to block 5
     HAL_Delay(TEST_DELAY);
-    fontnumber = 1;
-    LCDFont(fontnumber);
+    LCDFont(LCDFont_Default);
     LCDClear(0x00);
 }
 
-//****************************** TEST LOOP THREE ****************************
+//****************************** TestFont7to9 ****************************
 // fonts 7-9 tests,  Note  fonts  must be  commented in header file
 
-void TestThreeLoop() {
+void TestFont7to9() {
     // ***** TEST 3a font 7 large 12 * 16 *********
     // :NO LOWER CASE LETTERS for  font 7
     LCDClear(0X00); //clear whole screen
-    LCDFont(7); //font 7
+    LCDFont(LCDFont_Large); //font 7
     LCDgotoXY(20, 1);
     LCDString("TIME");
     LCDgotoXY(15, 3); // this font takes two blocks
@@ -422,7 +435,7 @@ void TestThreeLoop() {
     // ***** TEST 3b font 8 huge 16 * 24 *********
     // NUMBERS  only + : . /
     LCDClear(0x00);
-    LCDFont(8); // font 8 this font takes 3 blocks
+    LCDFont(LCDFont_Huge); // font 8 this font takes 3 blocks
     LCDgotoXY(0, 0);
     LCDString("10:39");
     LCDgotoXY(0, 3);
@@ -432,18 +445,18 @@ void TestThreeLoop() {
     // ********** TEST 3c font 9 MEGA font 16 * 32 *********
     //  NUMBERS  only + : . /
     LCDClear(0x00);
-    LCDFont(9); // font 8 this font takes 4 blocks
+    LCDFont(LCDFont_Mega); // font 8 this font takes 4 blocks
     LCDgotoXY(0, 1);
     LCDString("14.23");
     HAL_Delay(5000);
 
 }
 
-//****************************** TEST LOOP four****************************
-// bitmap tests,  Note  fonts one  must be  commented in header file
+//****************************** TestBitmap ****************************
+// bitmap tests,  Note  fonts one  must be  commented in font header file
 
-void TestFourLoop() {
-    // 'image1', 84x48px
+void TestBitmap() {
+    // 'image1', 84x48px snake
     const unsigned char mybitmap[504] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xf8, 0x7c,
         0x7c, 0x20, 0x00, 0xe0, 0xe0, 0xf0, 0xf0, 0xf0, 0x80, 0x00, 0x00, 0xe0, 0xf8, 0xf8, 0xfc, 0x38,
@@ -499,7 +512,7 @@ void TestFourLoop() {
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
     };
     LCDClear(0x00); // Clear whole screen
-    LCDFont(FontNumber); // Set the font
+    LCDFont(LCDFont_Default); // Set the font
     LCDgotoXY(0, 0); // (go to (X , Y) (0-84 columns, 0-5 blocks) top left corner
     LCDString("BITMAP TEST"); //print
     HAL_Delay(2000);
