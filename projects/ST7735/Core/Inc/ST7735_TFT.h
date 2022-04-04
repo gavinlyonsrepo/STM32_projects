@@ -21,14 +21,6 @@
 #include "main.h"
 
 
-// ****** USER OPTION 3 FONT ******
-// Comment in the fonts you want
-#define TFT_Font_One
-#define TFT_Font_Two
-#define TFT_Font_Three
-#define TFT_Font_Four
-#define TFT_Font_Five
-
 // ******** USER OPTION 4 SPI TYPE ***********
 // SPI TFT module connections
 // *** If Hardware SPI module is used, comment this line in ***
@@ -40,22 +32,6 @@
 // SDATA = PA7 ((PA0  ))
 // SCLK = PB3 (( PA1  ))
 // RST = PC0
-
-#ifdef TFT_Font_One
-#include "Font_One.h" // Default 5X8
-#endif
-#ifdef TFT_Font_Two
-#include "Font_Two.h" // Thick 7X8  (NO LOWERCASE LETTERS)
-#endif
-#ifdef TFT_Font_Three
-#include "Font_Three.h" // Seven segment 4X8
-#endif
-#ifdef TFT_Font_Four
-#include "Font_Four.h" // Wide  8X8 (NO LOWERCASE LETTERS)
-#endif
-#ifdef TFT_Font_Five
-#include "Font_Five.h"// Tiny 3X8
-#endif
 
 // *********** DEFINES ****************
 

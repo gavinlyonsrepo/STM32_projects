@@ -11,6 +11,7 @@
  */
 
 #include "ST7735_TFT.h"
+#include "ST7735_TFT_Font.h"
 
 // ********* Variables  **********
 
@@ -723,28 +724,28 @@ void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, u
         uint8_t line;
         switch (_TFTFontNumber) {
             case 1:
-#ifdef TFT_Font_One
-                line = FontOne[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
+#ifdef TFT_Font_Default
+                line = Font_Default[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
 #endif
                 break;
             case 2:
-#ifdef TFT_Font_Two
-                line = FontTwo[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
+#ifdef TFT_Font_Thick
+                line = Font_Thick[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
 #endif
                 break;
             case 3:
-#ifdef TFT_Font_Three
-                line = FontThree[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
+#ifdef TFT_Font_SevenSeg
+                line = Font_SevenSeg[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
 #endif
                 break;
             case 4:
-#ifdef TFT_Font_Four
-                line = FontFour[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
+#ifdef TFT_Font_Wide
+                line = Font_Wide[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
 #endif
                 break;
             case 5:
-#ifdef TFT_Font_Five
-                line = FontFive[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
+#ifdef TFT_Font_Tiny
+                line = Font_Tiny[(c - ASCIIOffset) * _TFTCurrentFontWidth + i];
 #endif
                 break;
         }

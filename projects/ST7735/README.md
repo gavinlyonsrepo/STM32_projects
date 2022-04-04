@@ -1,12 +1,11 @@
 Overview
 --------------------------------------------
-* Name: ST7735
-* Description: 
-Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels. no SD card holder.
-* Author: Gavin Lyons
-* STM32: STM32F070RB nucleo-64 
-* IDE:  STM32cubeIDE
-* Note: this is a fork of PIC project at [link](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
+1. Name: ST7735
+2. Description:  Library for TFT SPI LCD, ST7735 Driver, 
+3. Author: Gavin Lyons
+4. STM32: STM32F070RB nucleo-64 
+5. IDE:  STM32cubeIDE
+6.  Note: this is a fork of PIC project at [link](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 
 Features
 ----------------------
@@ -15,6 +14,7 @@ Features
 
 ![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
  
+This library was only tested on this TFT variant /size.
 This Color TFT LCD display has 128 x 128 resolution.
 It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.3V input voltage, 
 the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1. No SD Card. 
@@ -42,7 +42,7 @@ See USER OPTION 2 PCB_TYPE in Setup() function in main.c
 **Fonts**
 
 Five fonts are included.
-USER OPTION 3 FONT  at start of header file to 
+USER OPTION 3 FONT  at start of font file to 
 turn off unused fonts to save memory.
 
 Five fonts available : 
@@ -65,7 +65,7 @@ This library supports both Hardware SPI and software SPI. Change the define a to
 
 The Main.c contains  tests showing library functions
 There is also an TFT library (ST7735_TFT.c and ST7735_TFT.h),
-and five fonts files that contains ASCII pixel fonts.
+and a font files that contains ASCII pixel fonts.
 
 
 **Bitmap**
