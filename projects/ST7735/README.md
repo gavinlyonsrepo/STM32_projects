@@ -1,24 +1,31 @@
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
+
 Overview
 --------------------------------------------
 1. Name: ST7735
-2. Description:  Library for TFT SPI LCD, ST7735 Driver, 
+2. Description:  Library for TFT SPI LCD, ST7735 Driver,.
 3. Author: Gavin Lyons
 4. STM32: STM32F070RB nucleo-64 
-5. IDE:  STM32cubeIDE
+5. Toolchain:  STM32cubeIDE, HAL, C.
 6.  Note: this is a fork of PIC project at [link](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 
 Features
 ----------------------
 
-**TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels, No SD card**
-
 ![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
  
-This library was only tested on this TFT variant /size.
-This Color TFT LCD display has 128 x 128 resolution.
-It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.3V input voltage, 
-the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1. No SD Card. 
-Backlight control is left to user.
+ **Tested** 
+ 
+These two are the only type of  ST7735 library  tested on,
+but should work on other types in theory.
+
+1. TFT SPI LCD, ST7735 Driver, Red PCB v1.1, 1.44 , 128 x 128 pixels, "ST7735R Red Tab" 
+2. TFT SPI LCD, ST7735 Driver, Red PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
+
+The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
+"USER OPTIONS 1 & 2" in main.c and provide own bitmap to test  number 2 fully.
+No support fro built-in SD card holder (that some modules have) at present and backlight control is left to user.
 
 **Screen Size settings**
 
@@ -26,9 +33,7 @@ In the setup() function in USER OPTION 1 Screen Setup. Select your PCB size and 
 
 **PCB Version**
 
-There are 4 types of the ST7735 TFT display supported.
-Only red tab has been tested here. 
-It should work on other TFT displays using the different init functions, but not tested.
+There are 4 types of the ST7735 TFT display supported..
 User picks the one they want when calling TFTInitPCBType() function
 See USER OPTION 2 PCB_TYPE in Setup() function in main.c
 
@@ -76,13 +81,12 @@ Full color bitmaps will take up a lot of memory on this device.
 Note: The library was developed on a
 TFT without built-in SD card feature.
 
-1. Draw small custom icons X by 8 size where X is 0-128
+1. Draw small custom icons X by 8 size where X is 0-(128 -160)
 useful to create icons or buttons or fill rows with patterns.
 vertically addressed.
 
 2. Draw bitmap, horizontally addressed.
  
-
 **Connections**
 
 | TFT PinNum | Pindesc | STM32 SW SPI | STM32 HW SPI |
@@ -103,7 +107,7 @@ vertically addressed.
 Output
 -----------------------
 
-Output of some of the test routine's Left to right top to bottom
+Output of some of the test routine's Left to right top to bottom. 128X128 TFT
 
 1. Different defined colors at default font size 1. Full 16 bit colour 565 available 
 2. Different sizes of default font: 2,3,4 & 5 . Are fonts are scale-able
