@@ -1,11 +1,10 @@
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
+[![Website](https://img.shields.io/badge/Website-Link-blue.svg)](https://gavinlyonsrepo.github.io/)  [![Rss](https://img.shields.io/badge/Subscribe-RSS-yellow.svg)](https://gavinlyonsrepo.github.io//feed.xml)  [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
 
 Overview
 --------------------------------------------
 * Name: STM32_projects
 * Description: A collection of projects and libraries for the STM32 based micro-controller family.
 * Author: Gavin Lyons 
-* Copyright: (C) 2020 Gavin Lyons MIT. see LICENSE.md in docs folder
 * Website: [URL](https://gavinlyonsrepo.github.io/)
 
 Project List

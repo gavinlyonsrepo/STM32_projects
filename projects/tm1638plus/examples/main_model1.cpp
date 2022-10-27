@@ -294,33 +294,43 @@ void Test2() {
 }
 
 void Test3() {
-  //TEST 3 single segment (pos, (dp)gfedcba)
-  //In this case  segment g (middle dash) of digit position 7
-  tm.display7Seg(7, 0b01000000); // Displays "       -"
-  HAL_Delay(myTestDelay);
+  //TEST 3 single segment (digit position, (dp)gfedcba)
+  // (dp)gfedcba =  seven segments positions
+  uint8_t pos = 0;
+  for (pos = 0 ; pos<8 ; pos++)
+  {
+    tm.display7Seg(pos, 1<<(7-pos)); // Displays a single seg in (dp)gfedcba) in each  pos 0-7
+    HAL_Delay(myTestDelay1);
+  }
 }
 
 void Test4() {
   // Test 4 Hex digits.
-  tm.displayHex(0, 1);
-  tm.displayHex(1, 2);
-  tm.displayHex(2, 3);
-  tm.displayHex(3, 4);
-  tm.displayHex(4, 5);
-  tm.displayHex(5, 6);
-  tm.displayHex(6, 7);
-  tm.displayHex(7, 8);
+  tm.displayHex(0, 0);
+  tm.displayHex(1, 1);
+  tm.displayHex(2, 2);
+  tm.displayHex(3, 3);
+  tm.displayHex(4, 4);
+  tm.displayHex(5, 5);
+  tm.displayHex(6, 6);
+  tm.displayHex(7, 7);
   HAL_Delay(myTestDelay); // display 12345678
 
   tm.displayHex(0, 8);
   tm.displayHex(1, 9);
-  tm.displayHex(2, 10);
-  tm.displayHex(3, 11);
-  tm.displayHex(4, 12);
-  tm.displayHex(5, 13);
-  tm.displayHex(6, 14);
-  tm.displayHex(7, 15);
+  tm.displayHex(2, 0x0A);
+  tm.displayHex(3, 0x0B);
+  tm.displayHex(4, 0x0C);
+  tm.displayHex(5, 0x0D);
+  tm.displayHex(6, 0x0E);
+  tm.displayHex(7, 0x0F);
   HAL_Delay(myTestDelay); // display 89ABCDEF
+  tm.reset();
+
+  tm.displayHex(1, 0xFE);
+  tm.displayHex(7, 0x10);
+  HAL_Delay(myTestDelay); // display " E      0"
+
 }
 
 void Test5() {
@@ -344,18 +354,32 @@ void Test6() {
 }
 
 void Test7() {
-  // TEST 7a Integer
-  tm.displayIntNum(45, false); // "45      "
-  HAL_Delay(myTestDelay);
-  // TEST 7b Integer
-  tm.displayIntNum(99991, true); // "00099991"
-  HAL_Delay(myTestDelay);
-  tm.reset();
-  // TEST 7b tm.DisplayDecNumNIbble
-  tm.DisplayDecNumNibble(1234, 5678, false); // "12345678"
-  HAL_Delay(myTestDelay);
-  tm.DisplayDecNumNibble(123, 662, true); // "01230662"
-  HAL_Delay(myTestDelay);
+	  // TEST 7a Integer left aligned , NO leading zeros
+	  tm.displayIntNum(45, false, TMAlignTextLeft); // "45      "
+	  HAL_Delay(myTestDelay);
+	  // TEST 7b Integer left aligned , leading zeros
+	  tm.displayIntNum(99991, true, TMAlignTextLeft); // "00099991"
+	  HAL_Delay(myTestDelay);
+	  tm.reset();
+	  // TEST 7c Integer right aligned , NO leading zeros
+	  tm.displayIntNum(35, false, TMAlignTextRight); // "      35"
+	  HAL_Delay(myTestDelay);
+	  // TEST 7d Integer right aligned , leading zeros
+	  tm.displayIntNum(9983551, true, TMAlignTextRight); // "09983551"
+	  HAL_Delay(myTestDelay);
+
+	  // TEST 7e tm.DisplayDecNumNIbble left aligned
+	  tm.DisplayDecNumNibble(134, 70, false, TMAlignTextLeft); // "134 " "70" , left aligned, NO leading zeros
+	  HAL_Delay(myTestDelay);
+	  tm.DisplayDecNumNibble(23, 662, true, TMAlignTextLeft); // "0023" "0662" , left aligned , leading zeros
+	  HAL_Delay(myTestDelay);
+	  tm.reset();
+
+	  // TEST 7f tm.DisplayDecNumNIbble right aligned
+	  tm.DisplayDecNumNibble(43, 991, false, TMAlignTextRight); // "  43" " 991" , right aligned, NO leading zeros
+	  HAL_Delay(myTestDelay);
+	  tm.DisplayDecNumNibble(53, 8, true, TMAlignTextRight); // "0053" "0008" , right aligned , leading zeros
+	  HAL_Delay(myTestDelay);
 }
 
 void Test8() {
@@ -450,6 +474,8 @@ void Test13()
 
 }
 
+
+
 void Test14() {
   //Test 14 buttons and LED test, press switch number S-X to turn on LED-X, where x is 1-8.
   //The HEx value of switch is also sent to Serial port.
@@ -469,7 +495,7 @@ void Test14() {
        0x80 : S8 Pressed  1000 0000
       */
     doLEDs(buttons);
-     tm.displayIntNum(buttons, true);
+     tm.displayIntNum(buttons, false, TMAlignTextRight);
     HAL_Delay(250);
   }
 }

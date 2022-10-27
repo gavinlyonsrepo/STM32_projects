@@ -39,6 +39,12 @@
 #define TM_READ_DELAY 0 // uS
 #define TM_WRITE_DELAY 0 // uS
 
+typedef enum
+{
+	TMAlignTextRight = 1,
+	TMAlignTextLeft = 2,
+}AlignTextType_e; // Alignment of text
+
 // font , map of ASCII values/table to 7-segment, offset to position 32. 
 const  unsigned char SevenSeg[] = {
   0x00, /* (space) */

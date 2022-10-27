@@ -57,12 +57,12 @@ public:
 	void display7Seg(uint8_t position, uint8_t value);
 	
 	//Display an integer and leading zeros optional
-	void displayIntNum(unsigned long number, bool leadingZeros = true);
+	void displayIntNum(unsigned long number, bool leadingZeros = true, AlignTextType_e = TMAlignTextLeft);
 	
 	//Divides the display into two nibbles and displays a Decimal number in each.
 	//takes in two numbers 0-9999 for each nibble ,  and byte for decimal point display,
 	//and leading zeros optional
-	void DisplayDecNumNibble(uint16_t numberUpper, uint16_t numberLower, bool leadingZeros = true);
+	void DisplayDecNumNibble(uint16_t numberUpper, uint16_t numberLower, bool leadingZeros = true, AlignTextType_e = TMAlignTextLeft);
 	
 	  // Set the LEDs. passed one  16bit integer.
 	  // MODEL 3:
