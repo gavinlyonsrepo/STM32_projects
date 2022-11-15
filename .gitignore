@@ -1,42 +1,44 @@
 # root
-64blink/
-adc_dma_vidfour/
-blink/
-blinky_new/
-dma_vid4part2/
-myrtosdemovidthree/
-RemoteSystemsTempFiles/
 stuff/
-timer/
-timerex1F070/
-timerex2F070/
-timerex3F070/
-timeruSdelayexF070/
-.metadata
+
+#STM32
+STM32/64blink/
+STM32/adc_dma_vidfour/
+STM32/blink/
+STM32/blinky_new/
+STM32/dma_vid4part2/
+STM32/myrtosdemovidthree/
+STM32/RemoteSystemsTempFiles/
+STM32/timer/
+STM32/timerex1F070/
+STM32/timerex2F070/
+STM32/timerex3F070/
+STM32/timeruSdelayexF070/
+STM32/.metadata
 
 # tm1638
-tm1638plus/Debug/
-tm1638plus/Drivers/
+STM32/tm1638plus/Debug/
+STM32/tm1638plus/Drivers/
 
 # nokia 
-nokia5110text/Debug/
-nokia5110text/Drivers/
+STM32/nokia5110text/Debug/
+STM32/nokia5110text/Drivers/
 
 # erm19264
-ERM19264/Debug/
-ERM19264/Drivers/
+STM32/ERM19264/Debug/
+STM32/ERM19264/Drivers/
 
-#ST7735
-ST7735_TFT/Debug/
-ST7735_TFT/Drivers/
-ST7735_TFT/*.pdf
+# ST7735
+STM32/ST7735_TFT/Debug/
+STM32/ST7735_TFT/Drivers/
+STM32/ST7735_TFT/*.pdf
 
-#AHT10
-AHT10/Debug/
-AHT10/Drivers/
-AHT10/*.pdf
+# AHT10
+STM32/AHT10/Debug/
+STM32/AHT10/Drivers/
+STM32/AHT10/*.pdf
 
-#LM75A
-LM75a/Debug/
-LM75a/Drivers/
-LM75a/*.pdf
+# LM75A
+STM32/LM75a/Debug/
+STM32/LM75a/Drivers/
+STM32/LM75a/*.pdf

@@ -14,10 +14,10 @@ Project List
 
 | Num | IC |ToolChain | Description  | Link |
 | --- | --- | --- | --- | --- |
-| 1 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C++ HAL | TM1638 library | [URL ](tm1638plus/) |
-| 2 |  STM32F303K8T6 Nucleo-32  | STM32CubeIDE C HAL | Nokia 5110 PCD8544 LCD  library | [URL ](nokia5110text/)|
-| 3 |  STM32F070RBT6 Nucleo-64 | STM32CubeIDE C++ HAL | ERM19264_UC1609C LCD library| [URL ](ERM19264/)|
-| 4 |  STM32F070RBT6 Nucleo-64 | STM32CubeIDE C  HAL | ST7735 TFT library | [URL ](ST7735_TFT/)|
-| 5 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C  HAL | AHT10 Sensor Library | [URL ](AHT10/) |
-| 6 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C++ HAL | LM75A Sensor Library | [URL ](LM75A/)  |
+| 1 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C++ HAL | TM1638 library | [URL ](STM32/tm1638plus/) |
+| 2 |  STM32F303K8T6 Nucleo-32  | STM32CubeIDE C HAL | Nokia 5110 PCD8544 LCD  library | [URL ](STM32/nokia5110text/)|
+| 3 |  STM32F070RBT6 Nucleo-64 | STM32CubeIDE C++ HAL | ERM19264_UC1609C LCD library| [URL ](STM32/ERM19264/)|
+| 4 |  STM32F070RBT6 Nucleo-64 | STM32CubeIDE C  HAL | ST7735 TFT library | [URL ](STM32/ST7735_TFT/)|
+| 5 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C  HAL | AHT10 Sensor Library | [URL ](STM32/AHT10/) |
+| 6 |  STM32F303K8T6 Nucleo-32 | STM32CubeIDE C++ HAL | LM75A Sensor Library | [URL ](STM32/LM75a/)  |
 | 7 |  --- |---- | --- | --- |
