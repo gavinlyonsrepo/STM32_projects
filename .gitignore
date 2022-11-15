@@ -1,11 +1,42 @@
+# root
+64blink/
+adc_dma_vidfour/
+blink/
+blinky_new/
+dma_vid4part2/
+myrtosdemovidthree/
+RemoteSystemsTempFiles/
 stuff/
+timer/
+timerex1F070/
+timerex2F070/
+timerex3F070/
+timeruSdelayexF070/
+.metadata
 
-# eclipse specific git ignore
-projects/tm1638plus/src/.metadata/
-projects/tm1638plus/src/RemoteSystemsTempFiles/
-projects/tm1638plus/src/.settings/
-projects/tm1638plus/src/Debug/
-projects/tm1638plus/src/*.launch
+# tm1638
+tm1638plus/Debug/
+tm1638plus/Drivers/
 
-# STM32 git ignore
-projects/tm1638plus/src/*.mxproject
+# nokia 
+nokia5110text/Debug/
+nokia5110text/Drivers/
+
+# erm19264
+ERM19264/Debug/
+ERM19264/Drivers/
+
+#ST7735
+ST7735_TFT/Debug/
+ST7735_TFT/Drivers/
+ST7735_TFT/*.pdf
+
+#AHT10
+AHT10/Debug/
+AHT10/Drivers/
+AHT10/*.pdf
+
+#LM75A
+LM75a/Debug/
+LM75a/Drivers/
+LM75a/*.pdf
