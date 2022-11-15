@@ -64,6 +64,22 @@ typedef enum {
     LCDPadding_Both = 3 // LHS + RHS padding
 } LCDPaddingType_e; // Padding value
 
+typedef enum {
+	LCDFont_W_3 = 3, // tiny font
+	LCDFont_W_4 = 4, // seven segment font
+	LCDFont_W_5 = 5, // Default
+	LCDFont_W_7 = 7, // thick + homeSpun
+	LCDFont_W_8 = 8, // wide
+	LCDFont_W_12 = 12, // large , no lowercase letters
+	LCDFont_W_16 = 16 // mega and huge , numbers only
+} LCDFontWidth_e; // Size width of fonts in pixels, add padding for font_width < 9
+
+typedef enum {
+	LCDFont_O_Full = 0x00, //   full ASCII
+	LCDFont_O_Space = 0x20, // Starts at Space
+	LCDFont_O_Number = 0x2E, // // ASCII code for . is 0X2E (. / 0 1 etc)
+} LCDFontOffset_e; // font offset in the ASCII table
+
 // Functions prototypes
 void LCDInit(bool, uint8_t, uint8_t);
 void LCDgotoXY(uint8_t, uint8_t);

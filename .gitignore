@@ -23,6 +23,11 @@ STM32/tm1638plus/Drivers/
 # nokia 
 STM32/nokia5110text/Debug/
 STM32/nokia5110text/Drivers/
+STM32/nokia5110text/.cproject
+STM32/nokia5110text/.settings/language.settings.xml
+STM32/nokia5110text/nokia5110text Debug.launch
+STM32/nokia5110text/.settings/stm32cubeide.project.prefs
+
 
 # erm19264
 STM32/ERM19264/Debug/

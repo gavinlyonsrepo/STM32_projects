@@ -68,6 +68,7 @@ void TestBitmap(void); // bitmap test
 #define mybias 0x13 // LCD bias mode 1:48: Try 0x12 or 0x13 or 0x14
 
 #define TEST_DELAY 2000
+
 /* USER CODE END 0 */
 
 /**
@@ -233,7 +234,6 @@ void NokiaSetup(void)
 
 void TestPrint(void)
 {
-
 	uint16_t myPosInt = 765;
 	int16_t  myNegInt = -112;
 

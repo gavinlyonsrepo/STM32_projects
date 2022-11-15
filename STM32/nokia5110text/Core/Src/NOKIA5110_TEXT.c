@@ -7,9 +7,10 @@
  * URL: https://github.com/gavinlyonsrepo/STM32_projects
  */
 
-#include "NOKIA5110_TEXT.h"
 #include "main.h"
-#include  "NOKIA5110_TEXT_FONT_DATA.h"
+#include "NOKIA5110_TEXT.h"
+#include "NOKIA5110_TEXT_FONT_DATA.h"
+
 
 uint8_t _contrast = LCD_CONTRAST;
 uint8_t _bias = LCD_BIAS;
@@ -55,60 +56,41 @@ Passed a enum to set between fonts , 1-9
  */
 void LCDFont(LCDFontType_e FontNumber) {
 
-	typedef enum {
-		LCDFont_W_3 = 3, // tiny font
-		LCDFont_W_4 = 4, // seven segment font
-		LCDFont_W_5 = 5, // Default
-		LCDFont_W_7 = 7, // thick + homeSpun
-		LCDFont_W_8 = 8, // wide
-		LCDFont_W_12 = 12, // large , no lowercase letters
-		LCDFont_W_16 = 16 // mega and huge , numbers only
-	} LCDFontWidth_e; // Size width of fonts in pixels, add padding for font_width < 9
-
-	typedef enum {
-		LCDFont_O_Full = 0x00, //   full ASCII
-		LCDFont_O_Space = 0x20, // Starts at Space
-		LCDFont_O_Number = 0x2E, // // ASCII code for . is 0X2E (. / 0 1 etc)
-	} LCDFontOffset_e; // font offset in the ASCII table
-
-		LCDFontOffset_e offsetFont;
-		LCDFontWidth_e  widthFont;
-
 		_CurrentFontNumber = FontNumber;
 
 			switch (_CurrentFontNumber) {
 			case LCDFont_Default:  // default
-				_CurrentFontWidth = (widthFont = LCDFont_W_5);
-				_CurrentFontOffset =  ( offsetFont =  LCDFont_O_Space );
+				_CurrentFontWidth = LCDFont_W_5;
+				_CurrentFontOffset = LCDFont_O_Space;
 			break;
 			case LCDFont_Thick: // Thick
 			case LCDFont_HomeSpun:  // homespun
-				_CurrentFontWidth = (widthFont = LCDFont_W_7);
-				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+				_CurrentFontWidth = LCDFont_W_7;
+				_CurrentFontOffset =  LCDFont_O_Space;
 			break;
 			case LCDFont_Seven_Seg:  //seven seg
-				_CurrentFontWidth = (widthFont = LCDFont_W_4);
-				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+				_CurrentFontWidth = LCDFont_W_4;
+				_CurrentFontOffset =  LCDFont_O_Space;
 			break;
 			case LCDFont_Wide :  //wide
-				_CurrentFontWidth = (widthFont = LCDFont_W_8);
-				_CurrentFontOffset =   ( offsetFont = LCDFont_O_Space);
+				_CurrentFontWidth =  LCDFont_W_8;
+				_CurrentFontOffset =  LCDFont_O_Space;
 			break;
 			case LCDFont_Tiny : // tiny
-				_CurrentFontWidth = (widthFont = LCDFont_W_3);
-				_CurrentFontOffset =  ( offsetFont = LCDFont_O_Space);
+				_CurrentFontWidth = LCDFont_W_3;
+				_CurrentFontOffset =  LCDFont_O_Space;
 			break;
 			case LCDFont_Large : // large
-				_CurrentFontWidth = (widthFont = LCDFont_W_12);
-				_CurrentFontOffset = ( offsetFont = LCDFont_O_Space);
+				_CurrentFontWidth = LCDFont_W_12;
+				_CurrentFontOffset =  LCDFont_O_Space;
 			break;
 			case LCDFont_Huge: // huge
-				_CurrentFontWidth = (widthFont = LCDFont_W_16);
-				_CurrentFontOffset =  ( offsetFont =LCDFont_O_Number );
+				_CurrentFontWidth =  LCDFont_W_16;
+				_CurrentFontOffset = LCDFont_O_Number ;
 			break;
 			case LCDFont_Mega: // mega
-				_CurrentFontWidth = (widthFont = LCDFont_W_16);
-				_CurrentFontOffset =  ( offsetFont =LCDFont_O_Number ) ;
+				_CurrentFontWidth =  LCDFont_W_16;
+				_CurrentFontOffset = LCDFont_O_Number;
 			break;
 		}
 }
