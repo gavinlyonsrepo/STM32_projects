@@ -1,5 +1,5 @@
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
+[![Website](https://img.shields.io/badge/Website-Link-blue.svg)](https://gavinlyonsrepo.github.io/)  [![Rss](https://img.shields.io/badge/Subscribe-RSS-yellow.svg)](https://gavinlyonsrepo.github.io//feed.xml)  [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
 
 Overview
 --------------------------------------------
@@ -23,9 +23,7 @@ but should work on other types in theory.
 1. TFT SPI LCD, ST7735 Driver, Red PCB v1.1, 1.44 , 128 x 128 pixels, "ST7735R Red Tab" 
 2. TFT SPI LCD, ST7735 Driver, Red PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
 
-The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
-"USER OPTIONS 1 & 2" in main.c and provide own bitmap to test  number 2 fully.
-No support fro built-in SD card holder (that some modules have) at present and backlight control is left to user.
+No support for built-in SD card holder (that some modules have) at present and backlight control is left to user.
 
 **Screen Size settings**
 
@@ -46,11 +44,11 @@ See USER OPTION 2 PCB_TYPE in Setup() function in main.c
  
 **Fonts**
 
-Five fonts are included.
+Six fonts are included.
 USER OPTION 3 FONT  at start of font file to 
 turn off unused fonts to save memory.
 
-Five fonts available : 
+Six fonts available : 
 
 | Font num | Font name | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |  
@@ -59,6 +57,7 @@ Five fonts available :
 | 3 | Seven segment | 4x8 | ------ |
 | 4 | Wide | 8x8 | no lowercase letters |
 | 5 | Tiny | 3x8 |  ------ |
+| 6 | HomeSpun | 7x8 |  ------ |
 
 **SPI**
 
@@ -69,23 +68,38 @@ This library supports both Hardware SPI and software SPI. Change the define a to
 **Files**
 
 The Main.c contains  tests showing library functions
-There is also an TFT library (ST7735_TFT.c and ST7735_TFT.h),
-and a font files that contains ASCII pixel fonts.
+There is an TFT library (ST7735_TFT.c and ST7735_TFT.h),
+There are font files that contains ASCII pixel fonts.
+There are bitmap data files that contain the bitmap test data used by the main.c to test functions
 
+**fill Rectangles functions**
+
+| Num | Function Name |  Note |
+| ------ | ------ | ------ | 
+| 1 | TFTfillRectangle | --- |
+| 2 | TFTfillRect | uses TFTdrawFastVLine |
+| 3 | TFTfillRectangleBuffer | Uses buffered writes , ~5 times faster than #1 & #2 |
+| 4 | TFTfillScreen |  Wraps #1  |
+| 5 | TFTfillScreenBuffer | Wraps #3 |
 
 **Bitmap**
 
-There are two functions to support drawing bitmaps
-both are bi-color a background and a foreground.
+There are 4 functions to support drawing bitmaps.
 Full color bitmaps will take up a lot of memory on this device.
-Note: The library was developed on a
-TFT without built-in SD card feature.
+In the bitmap data file you can switch off the tests in USER OPTION 5.
 
-1. Draw small custom icons X by 8 size where X is 0-(128 -160)
-useful to create icons or buttons or fill rows with patterns.
-vertically addressed.
+| Num | Function Name | Colour support | bitmap size Max |  Note |
+| ------ | ------ | ------ | ------ | ------ |
+| 1 | Icon | bi-colour | (8 x (0-Max_y))   | useful to create icons  or fill rows with patterns ,Data vertically addressed |
+| 2 | Bitmap | bi-colour | 2048 bytes  | Data horizontally addressed |
+| 3 | BitmapBuffer | bi-colour   | 2048 bytes  |  Data horizontally  addressed  , uses buffered writes , 25 times faster than #2 |
+| 4 | Bitmap1624Buffer  | 16 bit or 24 bit color  | 32768 or 49152  | Data from Array  24 bit Converted by software to 16-bit color, uses buffered writes  |
 
-2. Draw bitmap, horizontally addressed.
+1. Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
+2. Math in bitmap size column 2-4  assumes 128x128 pixel screen.
+3. The data array for 1 -3 is created from image files using file data conversion tool [link](https://javl.github.io/image2cpp/)
+4. The data array for 4 is created from BMP files using file data conversion tool [link](https://notisrac.github.io/FileToCArray/)
+
  
 **Connections**
 
@@ -107,13 +121,22 @@ vertically addressed.
 Output
 -----------------------
 
-Output of some of the test routine's Left to right top to bottom. 128X128 TFT
+Output of some of the test routine's on a 128x128 TFT.
 
 1. Different defined colors at default font size 1. Full 16 bit colour 565 available 
 2. Different sizes of default font: 2,3,4 & 5 . Are fonts are scale-able
-3. Different Fonts at font size 2, five fonts included .
-4. Shapes
-5. Shapes
+3. Different Fonts at font size 2, six fonts included . font 6 not shown here.
+4. Shapes.
+5. MORE shapes!
 6. Bitmap (bi-color) A background and a foreground. 
+7. 16 bit color bitmap 128x128 image included in test data
+8. 24 bit color bitmap 64x64 image included in test data
 
 ![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
+![p1](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/16pic1.bmp)
+![p2](https://github.com/gavinlyonsrepo/STM32_projects/blob/master/images/24pic2.bmp)
+
+Note
+-------------
+
+Timer16 and Usart are included just for the Frames per second test TestFPS.

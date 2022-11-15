@@ -1,0 +1,12 @@
+FPS test results
+*************** 
+filscreen  = 10: 17 : 2
+fillrecantangle = 10: 17 :2
+fillrect = 10: 17 :2
+
+fillrectbuffer 10: 79 :9
+fillrectbuffer 10: 79 :9 sw spi
+
+bitmapbuffer 10: 117 :13
+bitmap 10 : 5 : .5
+

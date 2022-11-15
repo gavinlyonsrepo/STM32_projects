@@ -1,5 +1,5 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb,  SPI TFT module, library.  
+ * Project Name: ST7735
  * File: ST7735_TFT.h
  * Description: library header file   
  * Author: Gavin Lyons.
@@ -110,6 +110,7 @@
 #define   ST7735_TAN     0xED01
 #define   ST7735_GREY    0x9CD1
 #define   ST7735_BROWN   0x6201
+#define   ST7735_ORANGE  0xFC00
 
 // GPIO
 #define TFT_DC_SetHigh()  HAL_GPIO_WritePin(GPIOC, DC_TFT_PC1_Pin,GPIO_PIN_SET)
@@ -155,44 +156,56 @@ typedef enum
 	TFTFont_Seven_Seg = 3,
 	TFTFont_Wide = 4,
 	TFTFont_Tiny = 5,
-}ST7735_FontType_e; // Font type 1-5
+	TFTFont_Homespun = 6
+}ST7735_FontType_e; // Font type 1-6
 
-ST7735_modes_e     ST7735_modes;
-ST7735_rotate_e    ST7735_rotate;
-ST7735_PCBtype_e   ST7735_PCBtype;
-ST7735_FontType_e  ST7735_FontType;
+typedef enum
+{
+    TFTFont_width_3 = 3, // tiny
+    TFTFont_width_4 = 4, // Seven seg
+    TFTFont_width_5 = 5, // default
+    TFTFont_width_7 = 7, // thick , homespun
+    TFTFont_width_8 = 8 // wide
+}ST7735_FontWidth_e; // width of the font in bytes, cols.
+
+typedef enum
+{
+	TFT_BMP_16 = 16, // 16 bit per pixel
+	TFT_BMP_24 =24   // 24 bit per pixel
+}ST7735_BMPType_e; // bits per pixel of BMP.
 
 // ******** FUNCTION  PROTOTYPES ************ 
 
 
 // SPI 
-void TFTspiWrite(uint8_t);
+#ifdef TFT_SPI_HARDWARE
+	void TFTSPIHWInitialize(SPI_HandleTypeDef * );
+#endif
 void TFTwriteCommand(uint8_t);
 void TFTwriteData(uint8_t);
-#ifdef TFT_SPI_HARDWARE
-	void SPIHWInitialize(SPI_HandleTypeDef * );
-#endif
+void TFTspiWriteByte(uint8_t);
+void TFTspiWriteSoftware(uint8_t spidata);
+void TFTspiWriteBuffer(uint8_t* spidata, uint32_t len);
 
 // Init routines 
 void TFTInitPCBType(ST7735_PCBtype_e);
 void TFTInitScreenSize(uint8_t xOffset, uint8_t yOffset, uint16_t w, uint16_t h);
-void TFT_ResetPIN(void);
+void TFTResetPIN(void);
 
-void TFT_Rcmd1(void);
-void TFT_Rcmd2red(void);
-void TFT_Rcmd3(void);
-void TFT_Bcmd(void);
-void TFT_Rcmd2green(void);
+void TFTRcmd1(void);
+void TFTRcmd2red(void);
+void TFTRcmd3(void);
+void TFTBcmd(void);
+void TFTRcmd2green(void);
 
-void TFT_ST7735B_Initialize(void);
-void TFT_GreenTab_Initialize(void);
-void TFT_BlackTab_Initialize(void);
-void TFT_RedTab_Initialize(void);
+void TFTST7735BInitialize(void);
+void TFTGreenTabInitialize(void);
+void TFTBlackTabInitialize(void);
+void TFTRedTabInitialize(void);
 
 
 // Misc + Screen related
 void TFTsetAddrWindow(uint8_t, uint8_t, uint8_t, uint8_t);
-void TFTfillScreen(uint16_t color);
 void TFTpushColor(uint16_t color);
 void TFTsetRotation(ST7735_rotate_e r);
 void TFTchangeMode(ST7735_modes_e m);
@@ -206,10 +219,13 @@ void TFTdrawPixel(uint8_t, uint8_t, uint16_t);
 void TFTdrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
 void TFTdrawFastVLine(uint8_t x, uint8_t y, uint8_t h, uint16_t color);
 void TFTdrawFastHLine(uint8_t x, uint8_t y, uint8_t w, uint16_t color);
-
 void TFTdrawRectWH(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
+
 void TFTfillRectangle(uint8_t, uint8_t, uint8_t, uint8_t, uint16_t);
 void TFTfillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
+void TFTfillRectangleBuffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
+void TFTfillScreen(uint16_t color);
+void TFTfillScreenBuffer(uint16_t color);
 
 void TFTdrawRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color);
 void TFTfillRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color);
@@ -230,7 +246,9 @@ void TFTFontNum(ST7735_FontType_e FontNumber);
 
 // Bitmap & Icon
 void TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
-void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const unsigned char bitmap[]);
+void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t bitmap[]);
+void TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *bitmap);
+void TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e);
 
 #endif // file header guard 
 

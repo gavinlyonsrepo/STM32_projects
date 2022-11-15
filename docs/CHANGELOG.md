@@ -17,3 +17,7 @@
 
 * Feb 2022 
 	* Upgrade ERM19264_UC1609C library to version 1.4
+
+* November 2022
+	* upgraded Tm1638 to version 1.9.0 (arduino)
+	* upgraded ST7735 TFT to Version 1.5.0 (RPI)
