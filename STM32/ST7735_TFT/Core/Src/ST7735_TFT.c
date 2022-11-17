@@ -242,7 +242,7 @@ void TFTBcmd() {
 // Desc: init routine
 
 void TFTRcmd1() {
-	uint8_t seq1[] = {0x00, 0x06, 0x03};
+	uint8_t seq1[] = {0x01, 0x2C, 0x2D};
 	uint8_t seq2[] = {0xA2, 0x02, 0x84};
 	TFTwriteCommand(ST7735_SWRESET);
     HAL_Delay(150);
