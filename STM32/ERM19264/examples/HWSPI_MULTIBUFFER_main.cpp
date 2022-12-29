@@ -18,7 +18,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ERM19264_UC1609.h"
+#include "ERM19264_UC1609.hpp"
 #include <string.h>
 
 
@@ -310,7 +310,7 @@ void display_Left(MultiBuffer* targetbuffer)
   mylcd.setCursor(0, 40);
 
   mylcd.setCursor(0, 50);
-  mylcd.print("V 1.4.0");
+  mylcd.print("V 1.5.0");
   mylcd.drawFastVLine(92, 0, 63, FOREGROUND);
   mylcd.LCDupdate();
 }

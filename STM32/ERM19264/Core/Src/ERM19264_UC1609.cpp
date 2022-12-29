@@ -5,7 +5,7 @@
 * Author: Gavin Lyons.
 */
 
-#include "ERM19264_UC1609.h"
+#include <ERM19264_UC1609.hpp>
 #include "main.h"
 
 // Class Constructors // 2 off
@@ -399,7 +399,7 @@ void ERM19264_UC1609::LCDNoBufferChar(unsigned char  character)
 
    for (uint8_t column = 0 ; column <  UC1609_FONTWIDTH ; column++)
     {
-	   send_data((uint8_t)(UC_Font_One[(character*UC1609_FONTWIDTH) + column]));
+	   send_data((uint8_t)(pFontDefaultptr[(character*UC1609_FONTWIDTH) + column]));
     }
     UC1609_FONTPADDING;
     UC1609_CS_SetHigh;

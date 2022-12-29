@@ -18,10 +18,10 @@
 #define Print_h
 
 #include <inttypes.h>
+#include <Printable.hpp>
 #include <stdio.h> // for size_t
 
-#include "WString.h"
-#include "Printable.h"
+#include <WString.hpp>
 
 #define PGM_P const char*
 

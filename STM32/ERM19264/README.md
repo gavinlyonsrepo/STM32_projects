@@ -13,7 +13,7 @@ Overview
 6. 3 different modes: Multi-buffer , single buffer , light weight text only
 7. Custom bitmaps supported.
 8. Hardware or software SPI.
-9. 6 fonts.
+9. 8 fonts.
 10. print() function which can handle multiple data types 
 
 * Author: Gavin Lyons

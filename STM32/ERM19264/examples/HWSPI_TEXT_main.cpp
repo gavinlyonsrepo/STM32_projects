@@ -14,11 +14,11 @@
 
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <ERM19264_UC1609.hpp>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ERM19264_UC1609.h"
 #include <string.h>
 
 /* USER CODE END Includes */
@@ -291,12 +291,10 @@ void DisplayText(MultiBuffer *targetBuffer) {
 		mylcd.setTextColor(FOREGROUND);
 		mylcd.setTextSize(3);
 		mylcd.setCursor(0, 0);
-		mylcd.print("345.897");
+		mylcd.print(-345.886, 2);
 
-		// Test 2
-		mylcd.setTextSize(2);
-		mylcd.setCursor(0, 30);
-		mylcd.print("1234567890");
+		// Test 2 drawtext
+		mylcd.drawText(0,30 , myString,  FOREGROUND, BACKGROUND, 2);
 
 		// Test 3
 		mylcd.setTextSize(1);
@@ -346,41 +344,61 @@ void DisplayText(MultiBuffer *targetBuffer) {
 
 		TestReset();
 
-		// Test 7  fonts 2-4
-		mylcd.setTextSize(2);
+		// Test 7  fonts 2-6
+		mylcd.setTextSize(1);
 
 		mylcd.setFontNum(UC1609Font_Thick);
 		mylcd.setCursor(0, 0);
-		mylcd.print("THICK");
+		mylcd.print("THICK 345");
 
 		mylcd.setFontNum(UC1609Font_Seven_Seg);
-		mylcd.setCursor(0, 20);
+		mylcd.setCursor(0, 10);
 		mylcd.print("3354610");
 
 		mylcd.setFontNum(UC1609Font_Wide);
-		mylcd.setCursor(0, 40);
-		mylcd.print("WIDE");
+		mylcd.setCursor(0, 20);
+		mylcd.print("WIDE 675");
 
+		mylcd.setFontNum(UC1609Font_Tiny);
+		mylcd.setCursor(0, 30);
+		mylcd.print("Tiny 123");
+
+		mylcd.setFontNum(UC1609Font_Homespun);
+		mylcd.setCursor(0, 40);
+		mylcd.print("homespun");
 		TestReset();
 
-		// Test 8 font 5
+		// Test 8 font 7
 		mylcd.setFontNum(UC1609Font_Bignum);
 		mylcd.setTextColor(FOREGROUND, BACKGROUND);
 		mylcd.setCursor(80, 0);
-		mylcd.print(859);
+		mylcd.print(8.59);
 		mylcd.drawTextNumFont(0, 32, myString, BACKGROUND, FOREGROUND); //7b drawTextNumFont , 13:26:18 inverted
 		mylcd.drawCharNumFont(0, 0, '8', FOREGROUND, BACKGROUND); // 7c drawCharNumFont
 		mylcd.drawCharNumFont(160, 0, '4', BACKGROUND, FOREGROUND); // 7d drawCharNumFont inverted
 
 		TestReset();
 
-		// Test 9 font 6
+		// Test 9 font 8
 		mylcd.setFontNum( UC1609Font_Mednum);
 		mylcd.setCursor(80, 0);
-		mylcd.print(993);
+		mylcd.print(-9.93, 1);
 		mylcd.drawTextNumFont(0, 32, myString, BACKGROUND, FOREGROUND); // 8b drawTextNumFont , 13:26:18 inverted
 		mylcd.drawCharNumFont(0, 0, '6', FOREGROUND, BACKGROUND); // 8c drawCharNumFont
 		mylcd.drawCharNumFont(160, 0, '6', BACKGROUND, FOREGROUND); // 8d drawCharNumFont inverted
+
+		TestReset();
+
+		// Test 10 print function
+		mylcd.setFontNum(UC1609Font_Default);
+		mylcd.setCursor(0, 0);
+		mylcd.print(47, DEC);
+		mylcd.setCursor(0, 16);
+		mylcd.print(47, HEX);
+		mylcd.setCursor(0, 32);
+		mylcd.print(47, BIN);
+		mylcd.setCursor(0, 48);
+		mylcd.print(47, OCT);
 
 		TestReset();
 

@@ -18,7 +18,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ERM19264_UC1609.h"
+#include "ERM19264_UC1609.hpp"
 #include <string.h>
 
 
