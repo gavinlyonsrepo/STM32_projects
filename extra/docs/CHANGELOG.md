@@ -1,8 +1,5 @@
 # Changelog
 
-* Sep 2020
-	* FM radio project  added
-
 * April 2021
 	* Tm1638plus library added 
 	* ERM19264_UC1609C library added
@@ -21,3 +18,6 @@
 * November 2022
 	* upgraded Tm1638 to version 1.9.0 (arduino)
 	* upgraded ST7735 TFT to Version 1.5.0 (RPI)
+
+* Feb 2023 
+	* Added Hd44780 LCD library. 
