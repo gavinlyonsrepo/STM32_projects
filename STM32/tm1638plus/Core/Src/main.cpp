@@ -1,32 +1,30 @@
 /* USER CODE BEGIN Header */
+
 /*
   Project Name: TM1638
-  File: TM1638plus_TEST_Model1.ino
-  Description: ST32 demo file library for  TM1638 module(LED & KEY). Model 1
-  Carries out series of tests demonstrating STM32 library TM1638plus.
+  File: TM1638plus_TEST_Model2.ino
+  Description: demo file library for "model 2" TM1638 module(16 KEY 16 pushbuutons).
+  Carries out series of tests demonstrating STm32 cubeide library TM1638plus.
+  The tests will increment automatically with exception of test9, to enter press S16 during test8
 
-  TESTS:
-  TEST 0 Reset
-  TEST 1 Brightness
-  TEST 2 ASCII display
-  TEST 3 Set a single segment
-  TEST 4 Hex digits
-  TEST 5 Text String with Decimal point
-  TEST 6 TEXT + ASCII combo
-  TEST 7 Integer Decimal number
-  TEST 8 Text String + Float
-  TEST 9 Text String + decimal number
-  TEST 10 Multiple dots
-  TEST 11 Display Overflow
-  TEST 12 Scrolling text
-  TEST 13 setLED and setLEDs method
-  TEST 14 Buttons + LEDS
+  TESTS
 
-  Author: Gavin Lyons.
-  Created April  2021
+  TEST0 = reset function test
+  TEST1 =  decimal numbers
+  TEST2 =  Hexadecimal number
+  TEST3 = manually set segments
+  TEST4 = Display  strings
+  TEST5  =  ASCII to segments ( no reference to font table)
+  TEST6 = Brightness control
+  TEST7 = Scroll text example
+  TEST8 = Push buttons ReadKey16() buttons function , press 16 to goto test9
+  TEST9 = Push buttons ReadKeys16Two() alternate  buttons function
+
+  Created: April 2021
   IDE: STM32CubeIDE C++
   URL: https://github.com/gavinlyonsrepo/STM32_projects
 */
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -34,7 +32,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "TM1638plus.h" //include the library
+#include "TM1638plus_Model2.h" //include the library
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,7 +61,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void doLEDs(uint8_t value);
 void Test0(void);
 void Test1(void);
 void Test2(void);
@@ -74,20 +71,21 @@ void Test6(void);
 void Test7(void);
 void Test8(void);
 void Test9(void);
-void Test10(void);
-void Test11(void);
-void Test12(void); 
-void Test13(void);
-void Test14(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-TM1638plus tm;
+char buf[12];
+bool swap_nibbles = false; //Default is false if left out, see note in readme at URL
+TM1638plus_Model2 tm(swap_nibbles);
 // Some vars and defines for the tests.
-#define myTestDelay  5000
-#define myTestDelay1 1000
+// For test setup
+#define  myTestDelay 5000
+#define  myTestDelay1 1000
+#define  myTestDelay2 250
 uint8_t  testcount = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -120,34 +118,33 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  tm.displayBegin();
-  //Test 0 reset
-    Test0();
+  //strcpy((char*)buf,"hello\r\n");
+  //HAL_UART_Transmit(&huart2, buf, strlen((char*)buf),HAL_MAX_DELAY ); //baud 38400
+  tm.displayBegin(); // Init the module
+  HAL_Delay(1000);
+  // Test 0 reset test
+  tm.reset();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    switch (testcount)
-	  {
-	    case 1: Test1(); break; // Brightness
-	    case 2: Test2(); break; // ASCII display
-	    case 3: Test3(); break; // Set a single segment
-	    case 4: Test4(); break; // Hex digits
-	    case 5: Test5(); break; // Text String with Decimal point
-	    case 6: Test6(); break; // TEXT + ASCII combo
-	    case 7: Test7(); break; // Integer Decimal number
-	    case 8: Test8(); break; // Text String + Float hack
-	    case 9: Test9(); break; // Text String + decimal number
-	    case 10: Test10(); break; // Multiple Decimal points
-	    case 11: Test11(); break; // Display Overflow
-	    case 12: Test12(); break; // Scrolling text
-	    case 13: Test13(); break; // setLED and setLEDs
-	    case 14: Test14(); break; // Buttons + LEDS
-	  }
 	  testcount++;
-    /* USER CODE END WHILE */
+
+	  switch (testcount)
+	  {
+	    case 1: Test1(); break; // Test 1 decimal numbers
+	    case 2: Test2(); break; // Test 2 Hexadecimal number
+	    case 3: Test3(); break; // Test 3a 3b & 3C using DisplaySegments method
+	    case 4: Test4(); break; // Test 4 strings
+	    case 5: Test5(); break; // Test 5 ASCIItoSegment method
+	    case 6: Test6(); break; // Test 6  Brightness and reset
+	    case 7: Test7(); break; // Test 7 scroll text
+	    case 8: Test8(); break; // Test 8 Buttons , ReadKey16() returns byte 1-16 decimal, press S16 to goto test9
+	    case 9: Test9(); break; // Test 9 Buttons , Readkey16Two() alternate buttons function.
+	  }
+	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
@@ -261,184 +258,157 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void Test0()
+void Test1(void)
 {
-  // Test 0 reset test
-  tm.setLED(0, 1);
+  // Test 1 decimal numbers
+  // 1a-1e test tm.DisplayDecNum method
+  // 1a Left aligned leading zeros
+  tm.DisplayDecNum(250, 1 << 2, true, TMAlignTextLeft); // 000002.50
   HAL_Delay(myTestDelay);
-  tm.reset();
+  // 1b left aligned NO leading zeros
+  tm.DisplayDecNum(51, 0, false, TMAlignTextLeft); // "51     "
+  HAL_Delay(myTestDelay);
+
+   // 1c right aligned leading zeros
+  tm.DisplayDecNum(2813, 0 , true, TMAlignTextRight);  // 00002813
+  HAL_Delay(myTestDelay);
+
+  // 1d right aligned NO leading zeros
+  tm.DisplayDecNum(331285, 1 << 5 ,false, TMAlignTextRight); // "  3.31285"
+  HAL_Delay(myTestDelay);
+
+  // 1e negative number
+  tm.DisplayDecNum(-33, 0 , false, TMAlignTextRight); // "     -33"
+  HAL_Delay(myTestDelay);
+
+  //1f-1i test tm.DisplayDecNumNibble
+  // decimal numbers with the DisplayDecNumNibble function divides display into two nibbles.
+
+  // 1f Left aligned leading zeros,
+  tm.DisplayDecNumNibble(21 , 178, 0, true, TMAlignTextLeft); // "00210178"
+  HAL_Delay(myTestDelay);
+  // 1g Left aligned, NO leading zeros
+  tm.DisplayDecNumNibble(21 , 78, 1<<3 , false, TMAlignTextLeft); // "21  7.8  "
+  HAL_Delay(myTestDelay);
+  // 1h right aligned leading zeros
+  tm.DisplayDecNumNibble(977 , 34, 1<<4 , true, TMAlignTextRight); // "0977.0034"
+  HAL_Delay(myTestDelay);
+  // 1i right aligned, NO leading  zeros
+  tm.DisplayDecNumNibble(14 , 729, 1<<5 , false, TMAlignTextRight); // "  1.4 729"
+  HAL_Delay(myTestDelay);
 }
 
-void Test1() {
-  // Test 1  Brightness and reset
+void Test2(void)
+{
+	  // Test 2 Hexadecimal number
+	  // 2a leading zeros left alignment
+	  tm.DisplayHexNum(0xF, 0x456E, 0x00, true, TMAlignTextLeft); // 000F456E
+	  HAL_Delay(myTestDelay);
+	  // 2b NO leading zeros left alignment
+	  tm.DisplayHexNum(0xCD, 0xF23, 0x00, false, TMAlignTextLeft); // "CD F23 "
+	  HAL_Delay(myTestDelay);
+	  // 2c leading zeros right alignment
+	  tm.DisplayHexNum(0x45, 0xFF, 1 << 4, true, TMAlignTextRight); // 0045.00FF
+	  HAL_Delay(myTestDelay);
+	  // 2d NO leading zeros right alignment
+	  tm.DisplayHexNum(0xFAE, 0xFF, 0x00, false, TMAlignTextRight); // " FAE  FF"
+	  HAL_Delay(myTestDelay);
+}
+
+void Test3(void)
+{
+  // Test 3 manually set segments abcdefg(dp) = 01234567
+  // display a one in position one "       1"
+  tm.DisplaySegments(0, 0x00); //a
+  tm.DisplaySegments(1, 0x01); //b, for b turn on digit one only
+  tm.DisplaySegments(2, 0x01); //c, for c turn on digit one only
+  tm.DisplaySegments(3, 0x00); //d
+  tm.DisplaySegments(4, 0x00); //e
+  tm.DisplaySegments(5, 0x00); //f
+  tm.DisplaySegments(6, 0x00); //g
+  tm.DisplaySegments(7, 0x00); //DP
+  HAL_Delay(myTestDelay);
+
+  // Test 3b manually set segments
+  // Display "00000005"
+  tm.DisplaySegments(0, 0xFF); //a, turn a on for all digits
+  tm.DisplaySegments(1, 0xFE); //b
+  tm.DisplaySegments(2, 0xFF); //c
+  tm.DisplaySegments(3, 0xFF); //d
+  tm.DisplaySegments(4, 0xFE); //e
+  tm.DisplaySegments(5, 0xFF); //f
+  tm.DisplaySegments(6, 0x01); //g , for g middle segment, digit one only on
+  tm.DisplaySegments(7, 0x00); //decimal point, turn off all decmial points
+  HAL_Delay(myTestDelay);
+
+  // Test 3c manually set segments scroll g
+  // Display "-" countup to "--------"
+  tm.reset();
+  uint8_t dashvalue = 1;
+  for (uint8_t j = 0; j < 8;  j++)
+  {
+
+    tm.DisplaySegments(6, dashvalue); // g scrolling
+    dashvalue = (dashvalue*2)+1; // 1 to 256
+    HAL_Delay(myTestDelay1);
+  }
+  HAL_Delay(myTestDelay);
+
+}
+
+void Test4(void)
+{
+  // Test 4 strings
+  tm.DisplayStr("helloYOU", 1); // "helloYOU."
+  HAL_Delay(myTestDelay);
+  tm.DisplayStr("      Hi", 0x08); // "     . Hi"
+  HAL_Delay(myTestDelay);
+  tm.DisplayStr("   ---   ", 0XE7); // ". . .---. . ."
+  HAL_Delay(myTestDelay);
+  tm.DisplayStr(" helloU2", 0); // " helloU2"
+  HAL_Delay(myTestDelay);
+  tm.DisplayStr("hello", 0);  // "hello   "
+  HAL_Delay(myTestDelay);
+}
+
+void Test5(void)
+{
+  // Test 5 ASCII to segments takes an array of bytes and displays them
+  // without ref to the ASCII font table direct data to digits to displays 3F 3F 3F 6D 3F 3F 3F 6D = 00050005
+  // gfedcba = 3F for zero https://en.wikipedia.org/wiki/Seven-segment_display
+
+  const uint8_t values[8] = {0x3F, 0x3F, 0x3F, 0x6D, 0x3F, 0x3F, 0x3F, 0x6D}; // for ascii to segment test 00050005
+
+  tm.ASCIItoSegment(values);
+
+  HAL_Delay(myTestDelay);
+}
+
+void Test6(void)
+{
+  // Test 6  Brightness and reset
   for (uint8_t brightness = 0; brightness < 8; brightness++)
   {
     tm.brightness(brightness);
-    tm.displayText("00000000");
+    tm.DisplayStr("brightnes", 1);
     HAL_Delay(myTestDelay1);
   }
-  tm.reset();
-  // restore default brightness
-  tm.brightness(0x02);
-}
-
-void Test2() {
-  //Test 2 ASCII , display 2.341
-
-  tm.displayASCIIwDot(0, '2');
-  tm.displayASCII(1, '3');
-  tm.displayASCII(2, '4');
-  tm.displayASCII(3, '1');
-  HAL_Delay(myTestDelay);
+  tm.brightness(2);
   tm.reset();
 }
 
-void Test3() {
-  //TEST 3 single segment (digit position, (dp)gfedcba)
-  // (dp)gfedcba =  seven segments positions
-  uint8_t pos = 0;
-  for (pos = 0 ; pos<8 ; pos++)
-  {
-    tm.display7Seg(pos, 1<<(7-pos)); // Displays a single seg in (dp)gfedcba) in each  pos 0-7
-    HAL_Delay(myTestDelay1);
-  }
-}
 
-void Test4() {
-  // Test 4 Hex digits.
-  tm.displayHex(0, 0);
-  tm.displayHex(1, 1);
-  tm.displayHex(2, 2);
-  tm.displayHex(3, 3);
-  tm.displayHex(4, 4);
-  tm.displayHex(5, 5);
-  tm.displayHex(6, 6);
-  tm.displayHex(7, 7);
-  HAL_Delay(myTestDelay); // display 12345678
-
-  tm.displayHex(0, 8);
-  tm.displayHex(1, 9);
-  tm.displayHex(2, 0x0A);
-  tm.displayHex(3, 0x0B);
-  tm.displayHex(4, 0x0C);
-  tm.displayHex(5, 0x0D);
-  tm.displayHex(6, 0x0E);
-  tm.displayHex(7, 0x0F);
-  HAL_Delay(myTestDelay); // display 89ABCDEF
-  tm.reset();
-
-  tm.displayHex(1, 0xFE);
-  tm.displayHex(7, 0x10);
-  HAL_Delay(myTestDelay); // display " E      0"
-
-}
-
-void Test5() {
-  // Test 5 TEXT  with dec point
-  // abcdefgh with decimal point for c and d
-  tm.displayText("abc.d.efgh");
-  HAL_Delay(myTestDelay);
-}
-
-void Test6() {
-  // Test6  TEXT + ASCII combo
-  // ADC=.2.948
-  char text1[] = "ADC=.";
-  tm.displayText(text1);
-  tm.displayASCIIwDot(4, '2');
-  tm.displayASCII(5, '9');
-  tm.displayASCII(6, '4');
-  tm.displayASCII(7, '8');
-  HAL_Delay(myTestDelay);
-  tm.reset();
-}
-
-void Test7() {
-	  // TEST 7a Integer left aligned , NO leading zeros
-	  tm.displayIntNum(45, false, TMAlignTextLeft); // "45      "
-	  HAL_Delay(myTestDelay);
-	  // TEST 7b Integer left aligned , leading zeros
-	  tm.displayIntNum(99991, true, TMAlignTextLeft); // "00099991"
-	  HAL_Delay(myTestDelay);
-	  tm.reset();
-	  // TEST 7c Integer right aligned , NO leading zeros
-	  tm.displayIntNum(35, false, TMAlignTextRight); // "      35"
-	  HAL_Delay(myTestDelay);
-	  // TEST 7d Integer right aligned , leading zeros
-	  tm.displayIntNum(9983551, true, TMAlignTextRight); // "09983551"
-	  HAL_Delay(myTestDelay);
-
-	  // TEST 7e tm.DisplayDecNumNIbble left aligned
-	  tm.DisplayDecNumNibble(134, 70, false, TMAlignTextLeft); // "134 " "70" , left aligned, NO leading zeros
-	  HAL_Delay(myTestDelay);
-	  tm.DisplayDecNumNibble(23, 662, true, TMAlignTextLeft); // "0023" "0662" , left aligned , leading zeros
-	  HAL_Delay(myTestDelay);
-	  tm.reset();
-
-	  // TEST 7f tm.DisplayDecNumNIbble right aligned
-	  tm.DisplayDecNumNibble(43, 991, false, TMAlignTextRight); // "  43" " 991" , right aligned, NO leading zeros
-	  HAL_Delay(myTestDelay);
-	  tm.DisplayDecNumNibble(53, 8, true, TMAlignTextRight); // "0053" "0008" , right aligned , leading zeros
-	  HAL_Delay(myTestDelay);
-}
-
-void Test8() {
-  // TEST 8  TEXT STRING + integer SSSSIIII
-  char workStr[11];
-  uint16_t  data = 234;
-  sprintf(workStr, "ADC=.%04d", data); // "ADC=.0234"
-  tm.displayText(workStr);
-  HAL_Delay(myTestDelay);
-}
-
-void Test9() {
-  // TEST 9 Text String + Float  SSSSFFFF ,  just one possible method.
-  float voltage = 12.45;
-  uint16_t temp = 0;
-  char workStr[11];
-  uint8_t  digit1, digit2, digit3 , digit4;
-  voltage =  voltage * 100; // 1245
-  temp = (uint16_t)voltage;
-  digit1 = (temp / 1000) % 10;
-  digit2 = (temp / 100) % 10;
-  digit3 = (temp / 10) % 10;
-  digit4 =  temp % 10;
-
-  sprintf(workStr, "ADC=.%d%d.%d%d", digit1, digit2, digit3, digit4);
-  tm.displayText(workStr); //12.45.VOLT
-  HAL_Delay(myTestDelay);
-  tm.reset();
-}
-
-void Test10()
+void Test7(void)
 {
-  //TEST 10 Multiple dots test
-  tm.displayText("Hello...");
-  HAL_Delay(myTestDelay);
-  tm.displayText("...---..."); //SOS in morse
-  HAL_Delay(myTestDelay);
-}
-
-void Test11()
-{
-  //TEST11 user overflow
-  tm.displayText("1234567890abc"); //should display just 12345678
-  HAL_Delay(myTestDelay);
-  tm.reset();
-}
-
-void Test12() {
-  //TEST 12 scrolling text, just one possible method.
   char textScroll[17] = " Hello world 123";
 
   while(1)
   {
-  tm.displayText(textScroll);
+  tm.DisplayStr(textScroll, 0);
   HAL_Delay(myTestDelay1);
     if (strlen(textScroll) > 0)
     {
-      memmove(textScroll, textScroll+1, strlen(textScroll));
-      tm.displayText("        "); //Clear display or last character will drag across screen
+      memmove(textScroll, textScroll+1, strlen(textScroll)); // delete first char in array.
     }else
     {
       return;
@@ -447,65 +417,47 @@ void Test12() {
 
 }
 
-
-void Test13()
+void Test8(void)
 {
-  //Test 13 LED display
-  uint8_t LEDposition = 0;
-
-  // Test 13A Turn on redleds one by one, left to right, with setLED where 0 is L1 and 7 is L8 (L8 RHS of display)
-  for (LEDposition = 0; LEDposition < 8; LEDposition++) {
-    tm.setLED(LEDposition, 1);
-    HAL_Delay(500);
-    tm.setLED(LEDposition, 0);
-  }
-
-  // TEST 13b test setLEDs function (0xLEDXX) ( L8-L1 , XX )
-  // NOTE passed L8-L1 and on display L8 is on right hand side. i.e. 0x01 turns on L1. LXXX XXXX
-  // For model 1 just use upper byte , lower byte is is used by model3 for bi-color leds leave at 0x00 for model 1.
-  tm.setLEDs(0xFF00); //  all LEDs on
-  HAL_Delay(3000);
-   tm.setLEDs(0x0100); // Displays as LXXX XXXX (L1-L8) , NOTE on display L8 is on right hand side.
-  HAL_Delay(3000);
-  tm.setLEDs(0xF000); //  Displays as XXXX LLLL (L1-L8) , NOTE on display L8 is on right hand side.
-  HAL_Delay(3000);
-  tm.setLEDs(0x0000); // all off
-  HAL_Delay(3000);
-
-}
-
-
-
-void Test14() {
-  //Test 14 buttons and LED test, press switch number S-X to turn on LED-X, where x is 1-8.
-  //The HEx value of switch is also sent to Serial port.
-  tm.displayText("buttons ");
-  while (1) // Loop here forever
+  unsigned char buttons;
+  while(1)
   {
-    uint8_t buttons = tm.readButtons();
-      /* buttons contains a byte with values of button s8s7s6s5s4s3s2s1
-       HEX  :  Switch no : Binary
-       0x01 : S1 Pressed  0000 0001
-       0x02 : S2 Pressed  0000 0010
-       0x04 : S3 Pressed  0000 0100
-       0x08 : S4 Pressed  0000 1000
-       0x10 : S5 Pressed  0001 0000
-       0x20 : S6 Pressed  0010 0000
-       0x40 : S7 Pressed  0100 0000
-       0x80 : S8 Pressed  1000 0000
-      */
-    doLEDs(buttons);
-     tm.displayIntNum(buttons, false, TMAlignTextRight);
-    HAL_Delay(250);
-  }
+      // Test 8 , buttons readkey16() function, no debounce see notes at URL for example to debounce.
+      // returns 0-16 , 0 for nothing pressed.
+      // NOTE: pressing  S16 will move to test 9
+      buttons = tm.ReadKey16();
+      tm.DisplayDecNum(buttons, 0 ,false, TMAlignTextRight);
+      HAL_Delay( myTestDelay2);
+      if (buttons == 16)
+      {
+           //pressing 16 moves  to test 9
+          HAL_Delay( myTestDelay2);
+          return;
+      }
+    }
 }
 
-// scans the individual bits of value sets a LED based on which button pressed
-void doLEDs(uint8_t value) {
-  for (uint8_t LEDposition = 0; LEDposition < 8; LEDposition++) {
-    tm.setLED(LEDposition, value & 1);
-    value = value >> 1;
-  }
+//returns word with binary value of switch. S16 = Bit 15 , S15 = bit 14 etc
+void Test9(void)
+{
+  uint16_t buttons=0;
+  while(1)
+      {
+      // Test 9 buttons Read_key16_two() function
+      // returns a uint16_t where each bit represents a switch.
+      // S16S15S14S13S12S11S10S9S8S7S6S5S4S3SS2S1.
+      // eg S1 =  0x0001
+      // eg S16 = 0x8000
+      // eg S1 + S16 = 0x8001
+      // Can be used to detect multi key presses , see Notes section in readme.
+      // For issues related to display when pressing multi keys together.
+      buttons = tm.ReadKey16Two();
+      tm.DisplayStr("buttons2", 0);
+      sprintf(buf, "%hu\r\n", buttons);
+      // send buttons value DEC , back to terminal via usart2
+      HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+      HAL_Delay( myTestDelay2);
+      }
 }
 /* USER CODE END 4 */
 

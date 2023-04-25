@@ -1,50 +1,30 @@
-/*
-* Project Name: TM1638plus 
-* File: TM1638plus_Model2.cpp
-* Description: Source cpp file for Arduino library for "Model 2" TM1638 module(16 KEY 16 pushbuttons).
-* Author: Gavin Lyons.
-* Created April 2021
-* URL: https://github.com/gavinlyonsrepo/STM32_projects
+/*!
+	@file     tm1638plus_Model2.cpp
+	@author   Gavin Lyons
+	@brief    STm32 library Tm1638plus, Source file for TM1638 module((16 KEY 16 pushbuttons).) Model 2.
 */
+
 
 #include "TM1638plus_Model2.h"
 
-TM1638plus_Model2::TM1638plus_Model2(bool swap_nibbles) {
-  _SWAP_NIBBLES = swap_nibbles;
+/*!
+	@brief Constructor for class TM1638plus_Model2
+	@param  swap_nibbles default false, if true, swaps nibbles on display byte.
+*/
+TM1638plus_Model2::TM1638plus_Model2(bool swap_nibbles) : TM1638plus_common() {
+
+	_SWAP_NIBBLES = swap_nibbles;
 }
 
-void TM1638plus_Model2::displayBegin(void)
-{
-  sendCommand(TM_ACTIVATE);
-  brightness(TM_DEFAULT_BRIGHTNESS);
-  reset();
-}
 
-void TM1638plus_Model2::sendCommand(uint8_t value)
-{
-  //digitalWrite(_STROBE_IO, LOW);
-  HAL_GPIO_WritePin(GPIOB,TMSTB_Pin,GPIO_PIN_RESET);
-  sendData(value);
-  //digitalWrite(_STROBE_IO, HIGH);
-  HAL_GPIO_WritePin(GPIOB,TMSTB_Pin,GPIO_PIN_SET);
-}
-
-void TM1638plus_Model2::sendData(uint8_t data)
-{
-     TM_common.HighFreqshiftOut( data);
-}
-
-void TM1638plus_Model2::reset() {
-  sendCommand(TM_WRITE_INC); // set auto increment mode
-  HAL_GPIO_WritePin(GPIOB,TMSTB_Pin, GPIO_PIN_RESET);
-  sendData(TM_SEG_ADR);   // set starting address to 0
-  for (uint8_t position = 0; position < 16; position++)
-  {
-    sendData(0x00); //clear all segments
-  }
-   HAL_GPIO_WritePin(GPIOB,TMSTB_Pin,GPIO_PIN_SET);
-}
-
+/*!
+	@brief Send seven segment value to display
+	@param segment 0-7 byte of data corresponding to segments abcdefg(dp) 01234567.
+	@param digit  display digit position, 0x00 to 0xFF d8d7d6d5d54d3d2d1.
+	@note
+		for segment parameter a is 0 , dp is 7 , segment Value is which segments are off or on for each digit.
+		To to set all "a" on send (0x00,0xFF). To set all segment "g" off (0x06,0X00)
+*/
 void TM1638plus_Model2::DisplaySegments(uint8_t segment,  uint8_t digit)
 {
    if (_SWAP_NIBBLES == true)
@@ -64,13 +44,17 @@ void TM1638plus_Model2::DisplaySegments(uint8_t segment,  uint8_t digit)
 
 }
 
-void TM1638plus_Model2::brightness(uint8_t brightness)
-{
-    uint8_t  value = 0;
-    value = TM_BRIGHT_ADR + (TM_BRIGHT_MASK & brightness);
-    sendCommand(value);
-}
-
+/*!
+	@brief Display an Hexadecimal number  in each nibble (4 digits on display)
+	@param numberUpper   upper nibble integer 2^16
+	@param numberLower   lower nibble integer 2^16
+	@param dots Decimal point display, switch's on decimal point for those positions.  0 to 0xFF
+	@param leadingZeros  leading zeros set, true on , false off
+	@param TextAlignment left or right text alignment on display
+	@note
+		Divides the display into two nibbles and displays a Decimal number in each.
+		takes in two numbers 0-9999 for each nibble. Converts to string internally.
+*/
 void TM1638plus_Model2::DisplayHexNum(uint16_t  numberUpper, uint16_t numberLower,  uint8_t dots, bool leadingZeros, AlignTextType_e  TextAlignment )
 {
   char valuesUpper[TM_DISPLAY_SIZE + 1];
@@ -94,6 +78,14 @@ void TM1638plus_Model2::DisplayHexNum(uint16_t  numberUpper, uint16_t numberLowe
 
 }
 
+/*!
+	@brief Display an decimal number
+	@param number  integer to display 2^32.
+	@param dots Decimal point display, switch's on decimal point for those positions.
+	@param leadingZeros  leading zeros set, true on , false off.
+	@param TextAlignment  left or right text alignment on display.
+	@note Converts to string internally
+*/
 void TM1638plus_Model2::DisplayDecNum(unsigned long number,  uint8_t dots, bool leadingZeros, AlignTextType_e  TextAlignment )
 {
   char values[TM_DISPLAY_SIZE + 1];
@@ -113,6 +105,17 @@ void TM1638plus_Model2::DisplayDecNum(unsigned long number,  uint8_t dots, bool 
   DisplayStr(values, dots);
 }
 
+/*!
+	@brief Display an integer in each nibble (4 digits on display)
+	@param numberUpper   upper nibble integer 2^16
+	@param numberLower   lower nibble integer 2^16
+	@param dots Turn on or off  decimal points  to 0xFF d7d6d5d4d3d2d1d0
+	@param leadingZeros  leading zeros set, true on , false off
+	@param TextAlignment  left or right text alignment on display
+	@note
+		Divides the display into two nibbles and displays a Decimal number in each.
+		takes in two numbers 0-9999 for each nibble.
+*/
 void TM1638plus_Model2::DisplayDecNumNibble(uint16_t  numberUpper, uint16_t numberLower,  uint8_t dots, bool leadingZeros, AlignTextType_e  TextAlignment )
 {
   char valuesUpper[TM_DISPLAY_SIZE + 1];
@@ -135,6 +138,14 @@ void TM1638plus_Model2::DisplayDecNumNibble(uint16_t  numberUpper, uint16_t numb
   DisplayStr(valuesUpper, dots);
 }
 
+/*!
+	@brief Display a string, with decimal point display
+	@param string pointer to char array
+	@param dots Turn on or off  decimal points 0 to 0xFF d7d6d5d4d3d2d1d0
+	@note
+		Takes in string , converts it to ASCII using the font and masks for the decimal point.
+		Then passes array of eight ASCII bytes to DisplayValues function
+*/
 void TM1638plus_Model2::DisplayStr(const char* string, const  uint16_t dots)
 {
   uint8_t values[TM_DISPLAY_SIZE];
@@ -146,11 +157,11 @@ void TM1638plus_Model2::DisplayStr(const char* string, const  uint16_t dots)
   {
        if (!done && string[i] != '\0') {
          if (dots >> (7-i) & 1){  //if dots bit is set for that position apply the mask to turn on dot(0x80).
-            Result = SevenSeg[string[i] - TM_ASCII_OFFSET];
+            Result =  pFontSevenSegptr[string[i] - TM_ASCII_OFFSET];
             values[i] = (Result | TM_DOT_MASK_DEC); //apply the Dot bitmask to value extracted from ASCII table
             }
           else 
-            values[i] = SevenSeg[string[i] - TM_ASCII_OFFSET] ;
+            values[i] = pFontSevenSegptr[string[i] - TM_ASCII_OFFSET] ;
         }
       else {
         done = true;
@@ -161,6 +172,20 @@ void TM1638plus_Model2::DisplayStr(const char* string, const  uint16_t dots)
  ASCIItoSegment(values);
 }
 
+/*!
+	@brief Takes in Array of 8 ASCII bytes , Called from DisplayStr .
+		 Scans each ASCII byte converts to array of 8 segment bytes where each byte represents a segment.
+		 Then calls DisplaySegments() method to display segments on display
+	@param values An array of 8 ASCII bytes
+	@note
+	byte 0 represents a in segment and then each bit represents the a segment in each digit.
+	So for "00000005" is converted by DisplayStr to ASCII  hex"3F 3F 3F 3F 3F 3F 3F 6D" where left is first digit.
+	this is converted to hex "FF FE FF FF FE FF 01 00" by ASCIItoSegment,  Where left is first segment.
+	So "a" segment is turned on for all digits and "b" is on for all except last digit.
+	The bits are  mapping below abcdefg(dp) = 01234567 ! .
+	See for mapping of seven segment to digit https://en.wikipedia.org/wiki/Seven-segment_display
+	We have to do this as TM1638 model 2 is addressed by segment not digit unlike Model 1&3
+*/
 void TM1638plus_Model2::ASCIItoSegment(const uint8_t values[])
 {
   for (uint8_t  segment = 0; segment < TM_DISPLAY_SIZE; segment++) {
@@ -172,6 +197,13 @@ void TM1638plus_Model2::ASCIItoSegment(const uint8_t values[])
   }
 }
 
+/*!
+	@brief Read push buttons method ( one of two methods available)
+	@returns 0 if no button pressed or a  decimal value of buttons 1-16 (1 for S1 ... 16 for S16 ).
+	@note
+		 User may have to debounce buttons depending on application..
+		 model 2 example here in ADC file TM1638plus_ADC_TEST_Model2.ino
+*/
 unsigned char TM1638plus_Model2::ReadKey16()
 {
   unsigned char c[4], i, key_value=0;
@@ -186,7 +218,7 @@ unsigned char TM1638plus_Model2::ReadKey16()
   for (i = 0; i < 4; i++)
   {
      
-     c[i] =  TM_common.HighFreqshiftin();
+     c[i] =  HighFreqshiftin();
      
      if (c[i] == 0x04) key_value = 1 + (2*i); //00000100 4 0x04
      if (c[i] == 0x40) key_value = 2 + (2*i); //01000000 64 0x40
@@ -206,7 +238,18 @@ unsigned char TM1638plus_Model2::ReadKey16()
   //    8,16 7,15     6,14 5,13     4,12 3,11     2,10  1,9 :button value
 }
 
- uint16_t TM1638plus_Model2::ReadKey16Two()
+/*!
+	@brief Read push buttons method ( one of two methods available)
+	@returns
+		A 16 bit integer where each bit correspond to a switch.
+		-# S1 = 0x0001
+		-# S16 = 0x8000
+		-# S1 + S16 together = 0x8001
+	@note
+		 Can detect multiple key presses. However,  See notes section in readme regarding,
+		 problems with seven segment display when pressing certain keys in combination.
+*/
+uint16_t TM1638plus_Model2::ReadKey16Two()
 {
     
   uint16_t key_value = 0;
@@ -222,7 +265,7 @@ unsigned char TM1638plus_Model2::ReadKey16()
   HAL_GPIO_Init(TMDATA_GPIO_Port, &GPIO_InitStruct);
   for (i = 0; i < 4; i++)
   {
-      Datain =  TM_common.HighFreqshiftin();
+      Datain =  HighFreqshiftin();
         
       // turn Datain ABCDEFGI = 0BC00FG0  into 00CG00BF see matrix below
       Datain = (((Datain & 0x40) >> 3 | (Datain & 0x04)) >> 2) | (Datain & 0x20) | (Datain & 0x02) << 3;
