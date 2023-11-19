@@ -60,6 +60,7 @@ static void MX_SPI1_Init(void);
 /* USER CODE BEGIN 0 */
 ERM19264_UC1609  mylcd(true);
 #define VbiasPOT 0x49 //Constrast 00 to FE , 0x49 is default. user adjust
+#define LCDRAMADDRCTRL 0x02  // RAM address control: Range 0-0x07, optional, default 0x02
 /* USER CODE END 0 */
 
 /**
@@ -96,7 +97,7 @@ int main(void)
   int count = 0;
   float count2 = 17.6879;
   uint8_t buf[12];
-  mylcd.LCDbegin(VbiasPOT,&hspi1); // initialize the LCD
+  mylcd.LCDbegin(LCDRAMADDRCTRL, VbiasPOT,&hspi1); // initialize the LCD
   mylcd.LCDFillScreen(0x00, 0); // clear screen
   HAL_Delay(500);
   /* USER CODE END 2 */

@@ -59,6 +59,7 @@ void display_Left(MultiBuffer *targetbuffer);
 ERM19264_UC1609 mylcd(false);
 uint16_t count = 0;
 #define VbiasPOT 0x49 //Constrast 00 to FE , 0x49 is default. user adjust
+#define LCDRAMADDRCTRL 0x02  // RAM address control: Range 0-0x07, optional, default 0x02
 #define MYLCDHEIGHT 64
 #define MYLCDWIDTH  192
 #define DisplayDelay1 5000
@@ -97,7 +98,7 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 
 	uint8_t buf[12];
-	mylcd.LCDbegin(VbiasPOT, &hspi1); // initialize the LCD
+	mylcd.LCDbegin(LCDRAMADDRCTRL, VbiasPOT, &hspi1); // initialize the LCD
 	mylcd.LCDFillScreen(0xE5, 0); // Fill the screen with a a pattern , "just for splashscreen effect"
 	HAL_Delay(1500);
 	mylcd.LCDFillScreen(0x00, 0); // Clear the screen

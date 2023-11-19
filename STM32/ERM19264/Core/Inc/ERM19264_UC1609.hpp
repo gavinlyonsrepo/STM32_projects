@@ -153,7 +153,7 @@ class ERM19264_UC1609 : public custom_graphics {
      void  LCDNoBufferString(const unsigned char *characters);
 #endif
     
-    void LCDbegin(uint8_t contrast, SPI_HandleTypeDef * );
+    void LCDbegin(uint8_t adddressCtrl , uint8_t contrast, SPI_HandleTypeDef * );
     void LCDinit(void);
     void LCDEnable(uint8_t on);
     void LCDFillScreen(uint8_t pixel, uint8_t mircodelay);
@@ -176,6 +176,8 @@ class ERM19264_UC1609 : public custom_graphics {
     SPI_HandleTypeDef * _hspi1;
     bool _SPI_Hardware = false;
     uint8_t _VbiasPOT; // Contrast default 0x49 datasheet 00-FE
+    uint8_t _AddressCtrl; /**< Set AC [2:0] Program registers  for RAM address control. 0x00 to 0x07*/
+
 };
 
 #endif

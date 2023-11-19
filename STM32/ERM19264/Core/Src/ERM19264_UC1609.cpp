@@ -31,12 +31,15 @@ ERM19264_UC1609  :: ERM19264_UC1609(bool SPIHardware) :custom_graphics(LCD_WIDTH
 
 // Desc: begin Method initialise LCD 
 // SPI setup
-// Param1: VBiasPOT default = 0x49 , range 0x00 to 0xFE
-// Param2: pointer to SPIhandle for SPI port one
-void ERM19264_UC1609::LCDbegin (uint8_t VbiasPOT,SPI_HandleTypeDef  * hspi1)
+// Param1: AddressCtrl AC [2:0] registers for RAM addr ctrl. default=2 range 0-7
+// Param2: VBiasPOT default = 0x49 , range 0x00 to 0xFE
+// Param3: pointer to SPIhandle for SPI port one
+void ERM19264_UC1609::LCDbegin (uint8_t AddressCtrl ,uint8_t VbiasPOT,SPI_HandleTypeDef  * hspi1)
 {
   if(isHardwareSPI()) _hspi1 = hspi1 ;
  _VbiasPOT  = VbiasPOT;
+ if (AddressCtrl > 7 ) AddressCtrl = 0x02;
+ _AddressCtrl = AddressCtrl;
   LCDinit();
 }
 
@@ -53,7 +56,7 @@ void ERM19264_UC1609::LCDinit()
   UC1609_CS_SetLow;
 
   send_command(UC1609_TEMP_COMP_REG, UC1609_TEMP_COMP_SET); 
-  send_command(UC1609_ADDRESS_CONTROL, UC1609_ADDRESS_SET); 
+  send_command(UC1609_ADDRESS_CONTROL, _AddressCtrl );
   send_command(UC1609_FRAMERATE_REG, UC1609_FRAMERATE_SET);
   send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);  
   send_command(UC1609_POWER_CONTROL,  UC1609_PC_SET); 
