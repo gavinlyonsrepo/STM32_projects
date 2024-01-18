@@ -1,419 +1,381 @@
-/*
-* Project Name: ERM19264_UC1609
-* File: ERM19264_UC1609.cpp
-* Description: ERM19264 LCD driven by UC1609C controller source file
-* Author: Gavin Lyons.
+/*!
+	@file ERM19264_UC1609.cpp
+	@brief ERM19264 LCD driven by UC1609C controller, src file.
+	@author Gavin Lyons.
 */
 
 #include <ERM19264_UC1609.hpp>
 #include "main.h"
 
-// Class Constructors // 2 off
-// No buffer or buffer, bool for SPI type true for hw , false for sw
 
-#ifdef NO_BUFFER
-
-ERM19264_UC1609  :: ERM19264_UC1609(bool SPIHardware)
+/*!
+	@brief init the screen/sharedBuffer object
+	@param mybuffer Pointer to buffer array data(arrays decay to  pointers)
+	@param w width of buffer
+	@param h height of buffer
+	@param x offset of buffer
+	@param y offset of buffer
+ */
+ERM19264_UC1609_Screen::ERM19264_UC1609_Screen(uint8_t* mybuffer, uint8_t w,  uint8_t h, int16_t  x, int16_t y)
 {
-  _SPI_Hardware = SPIHardware;
+	screenBuffer = mybuffer; // pointer to buffer
+	width = w;   // bitmap x size
+	height = h; // bitmap y size
+	xoffset = x; // x offset
+	yoffset = y; // y offset
 }
 
-#else
 
-ERM19264_UC1609  :: ERM19264_UC1609(bool SPIHardware) :custom_graphics(LCD_WIDTH, LCD_HEIGHT)
+/*!
+	@brief init the LCD class object
+	@param lcdwidth width of LCD in pixels
+	@param lcdheight height of LCD in pixels
+ */
+ERM19264_UC1609::ERM19264_UC1609(int16_t LCDwidth, int16_t LCDheight ):custom_graphics(LCDwidth, LCDheight)
 {
-	_SPI_Hardware = SPIHardware;
-
+	_LCD_HEIGHT = LCDheight;
+	_LCD_WIDTH = LCDwidth;
 }
 
-#endif
+/*!
+ @brief begin Method initialise LCD
+ @param AddressCtrl AC [2:0] registers for RAM addr ctrl. default=2 range 0-7
+ @param VBiasPOT contast default = 0x49 , range 0x00 to 0xFE
+ @param hspi1 pointer to SPIhandle struct for SPI port
+*/
+void ERM19264_UC1609::LCDbegin(uint8_t AddressCtrl, uint8_t VbiasPOT,
+		SPI_HandleTypeDef* hspi1) {
+	_hspi1 = hspi1;
+	_VbiasPOT = VbiasPOT;
+	if (AddressCtrl > 7)
+		AddressCtrl = 0x02;
+	_AddressCtrl = AddressCtrl;
+	LCDinit();
+}
 
+/*!
+	@brief getter for Library version number
+	@return the version number 101 is 1.0.1
+*/
+uint16_t ERM19264_UC1609::LCDLibVerNumGet() {
+	return _LibVerNum;
+}
 
-// Desc: begin Method initialise LCD 
-// SPI setup
-// Param1: AddressCtrl AC [2:0] registers for RAM addr ctrl. default=2 range 0-7
-// Param2: VBiasPOT default = 0x49 , range 0x00 to 0xFE
-// Param3: pointer to SPIhandle for SPI port one
-void ERM19264_UC1609::LCDbegin (uint8_t AddressCtrl ,uint8_t VbiasPOT,SPI_HandleTypeDef  * hspi1)
-{
-  if(isHardwareSPI()) _hspi1 = hspi1 ;
- _VbiasPOT  = VbiasPOT;
- if (AddressCtrl > 7 ) AddressCtrl = 0x02;
- _AddressCtrl = AddressCtrl;
-  LCDinit();
+/*!
+	@brief begin Method initialise LCD
+	@param VbiasPOT contrast default = 0x49 , range 0x00 to 0xFE
+ */
+void ERM19264_UC1609::LCDinit() {
+	HAL_Delay(UC1609_INIT_DELAY2); //3mS delay, datasheet
+	UC1609_CD_SetHigh;
+	UC1609_CS_SetHigh;
+	LCDReset();
+
+	UC1609_CS_SetLow;
+
+	send_command(UC1609_TEMP_COMP_REG, UC1609_TEMP_COMP_SET);
+	send_command(UC1609_ADDRESS_CONTROL, _AddressCtrl);
+	send_command(UC1609_FRAMERATE_REG, UC1609_FRAMERATE_SET);
+	send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);
+	send_command(UC1609_POWER_CONTROL, UC1609_PC_SET);
+	HAL_Delay(UC1609_INIT_DELAY);
+
+	send_command(UC1609_GN_PM, 0);
+	send_command(UC1609_GN_PM, _VbiasPOT); //  changed by user
+
+	send_command(UC1609_DISPLAY_ON, 0x01); // turn on display
+	send_command(UC1609_LCD_CONTROL, UC1609_ROTATION_NORMAL); // rotate to normal
+
+	UC1609_CS_SetHigh;
+}
+
+/*!
+	 @brief Sends a command to the display
+	 @param command Command to send
+	 @param value the values to change
+	 @note command and value  will be combined with OR
+*/
+void ERM19264_UC1609::send_command(uint8_t command, uint8_t value) {
+	UC1609_CD_SetLow;
+	send_data(command | value);
+	UC1609_CD_SetHigh;
+}
+
+/*!
+	@brief Resets LCD in a four wire setup called at start
+	and  should also be called in a controlled power down setting
+*/
+void ERM19264_UC1609::LCDReset() {
+	UC1609_RST_SetLow;
+	HAL_Delay(UC1609_RESET_DELAY);
+	UC1609_RST_SetHigh;
+	HAL_Delay(UC1609_RESET_DELAY2);
+}
+
+/*!
+	@brief Powerdown procedure for LCD see datasheet P40
+*/
+void ERM19264_UC1609::LCDPowerDown(void) {
+	LCDReset();
+	LCDEnable(0);
+}
+
+/*!
+	 @brief Turns On Display
+	 @param bits  1  display on , 0 display off
+*/
+void ERM19264_UC1609::LCDEnable(uint8_t bits) {
+	UC1609_CS_SetLow;
+	send_command(UC1609_DISPLAY_ON, bits);
+	UC1609_CS_SetHigh;
 }
 
 
-// Desc: Called from LCDbegin carries out Power on sequence and register init
-// Can be used to reset LCD to default values.
-void ERM19264_UC1609::LCDinit()
- {
-  HAL_Delay(UC1609_INIT_DELAY2); //3mS delay, datasheet
-  UC1609_CD_SetHigh;
-  UC1609_CS_SetHigh;
-  LCDReset();
+/*!
+	@brief Rotates the display using LCD built-in rotate commands
+	@details Set LC[2:1] for COM (row) mirror (MY), SEG (column) mirror (MX).
+		Param1: 4 possible values 000 010 100 110 (defined)
+	@note If Mx is changed the buffer must BE updated see examples.
+*/
+void ERM19264_UC1609::LCDrotate(uint8_t rotatevalue) {
+	UC1609_CS_SetLow;
+	switch (rotatevalue) {
+	case 0:
+		rotatevalue = 0;
+		break;
+	case 0x02:
+		rotatevalue = UC1609_ROTATION_FLIP_ONE;
+		break;
+	case 0x04:
+		rotatevalue = UC1609_ROTATION_NORMAL;
+		break;
+	case 0x06:
+		rotatevalue = UC1609_ROTATION_FLIP_TWO;
+		break;
+	default:
+		rotatevalue = UC1609_ROTATION_NORMAL;
+		break;
+	}
+	send_command(UC1609_LCD_CONTROL, rotatevalue);
+	UC1609_CS_SetHigh;
+}
 
-  UC1609_CS_SetLow;
+/*!
+	@brief Scroll the displayed image up by SL rows.
+	@details The valid SL value is between 0 (for no
+		scrolling) and (64).
+		Setting SL outside of this range causes undefined effect on the displayed image.
+	@param bits 0-64 line number y-axis
+*/
+void ERM19264_UC1609::LCDscroll(uint8_t bits) {
+	UC1609_CS_SetLow;
+	send_command(UC1609_SCROLL, bits);
+	UC1609_CS_SetHigh;
+}
 
-  send_command(UC1609_TEMP_COMP_REG, UC1609_TEMP_COMP_SET); 
-  send_command(UC1609_ADDRESS_CONTROL, _AddressCtrl );
-  send_command(UC1609_FRAMERATE_REG, UC1609_FRAMERATE_SET);
-  send_command(UC1609_BIAS_RATIO, UC1609_BIAS_RATIO_SET);  
-  send_command(UC1609_POWER_CONTROL,  UC1609_PC_SET); 
-  HAL_Delay(UC1609_INIT_DELAY);
-  
-  send_command(UC1609_GN_PM, 0);
-  send_command(UC1609_GN_PM, _VbiasPOT); //  changed by user
-  
-  send_command(UC1609_DISPLAY_ON, 0x01); // turn on display
-  send_command(UC1609_LCD_CONTROL, UC1609_ROTATION_NORMAL); // rotate to normal 
-  
-  UC1609_CS_SetHigh;
+/*!
+	 @brief invert the display
+	 @param bits 1 invert , 0 normal
+*/
+void ERM19264_UC1609::LCDInvertDisplay(uint8_t bits) {
+	UC1609_CS_SetLow;
+	send_command(UC1609_INVERSE_DISPLAY, bits);
+	UC1609_CS_SetHigh;
+}
+
+/*!
+	@brief turns on all Pixels
+	@param bits Set DC[1] to force all SEG drivers to output ON signals
+	1 all on ,  0 all off
+*/
+void ERM19264_UC1609::LCDAllpixelsOn(uint8_t bits) {
+	UC1609_CS_SetLow;
+	send_command(UC1609_ALL_PIXEL_ON, bits);
+	UC1609_CS_SetHigh;
+}
+
+/*!
+	@brief Fill the screen NOT the buffer with a datapattern
+	@param dataPattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
+	@param delay optional delay in microseconds can be set to zero normally.
+*/
+void ERM19264_UC1609::LCDFillScreen(uint8_t dataPattern = 0) {
+	UC1609_CS_SetLow;
+	uint16_t numofbytes = _LCD_WIDTH * (_LCD_HEIGHT / 8); // width * height
+	for (uint16_t i = 0; i < numofbytes; i++) {
+		send_data(dataPattern);
+	}
+	UC1609_CS_SetHigh;
+}
+
+/*!
+	 @brief Fill the chosen page at cursor  with a datapattern
+	 @param dataPattern can be set to 0 to FF (not buffer)
+*/
+void ERM19264_UC1609::LCDFillPage(uint8_t dataPattern = 0) {
+	UC1609_CS_SetLow;
+	uint16_t numofbytes = ((_LCD_WIDTH * (_LCD_HEIGHT / 8)) / 8); // (width * height/8)/8 = 192 bytes
+	for (uint16_t i = 0; i < numofbytes; i++) {
+		send_data(dataPattern);
+	}
+	UC1609_CS_SetHigh;
+}
+
+/*!
+	 @brief Draw a bitmap in direct to screen to the screen
+	 @param x offset 0-192
+	 @param y offset 0-64
+	 @param w width 0-192
+	 @param h height 0-64
+	 @param data  pointer to the bitmap  data
+	 @note No buffer used. Data drawn onto screen directly
+*/
+void ERM19264_UC1609::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h,
+		const uint8_t *data) {
+	UC1609_CS_SetLow;
+
+	uint8_t tx, ty;
+	uint16_t offset = 0;
+	uint8_t column = (x < 0) ? 0 : x;
+	uint8_t page = (y < 0) ? 0 : y >> 3;
+
+	for (ty = 0; ty < h; ty = ty + 8) {
+		if (y + ty < 0 || y + ty >= _LCD_HEIGHT) {
+			continue;
+		}
+		send_command(UC1609_SET_COLADD_LSB, (column & 0x0F));
+		send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
+		send_command(UC1609_SET_PAGEADD, page++);
+
+		for (tx = 0; tx < w; tx++) {
+			if (x + tx < 0 || x + tx >= _LCD_WIDTH) {
+				continue;
+			}
+			offset = (w * (ty >> 3)) + tx;
+			send_data(data[offset]);
+		}
+	}
+	UC1609_CS_SetHigh;
 }
 
 
-// Desc: Sends a command to the display
-// Param1: the command
-// Param2: the values to change
-void ERM19264_UC1609::send_command (uint8_t command, uint8_t value) 
-{
-  UC1609_CD_SetLow; 
-  send_data(command | value);
-  UC1609_CD_SetHigh;
-}
 
-// Desc: Resets LCD in a four wire setup called at start 
-// and  should also be called in a controlled power down setting
-void ERM19264_UC1609::LCDReset () 
-{
-  UC1609_RST_SetLow;
-  HAL_Delay(UC1609_RESET_DELAY);
-  UC1609_RST_SetHigh;
-  HAL_Delay(UC1609_RESET_DELAY2);
-}
-
-// Desc: Powerdown procedure for LCD see datasheet P40
-void ERM19264_UC1609::LCDPowerDown(void)
-{
-  LCDReset ();
-  LCDEnable(0);
-}
-
-
-// Desc: turns on display
-// Param1: bits 1  on , 0 off
-void ERM19264_UC1609::LCDEnable (uint8_t bits) 
-{
- UC1609_CS_SetLow;
-  send_command(UC1609_DISPLAY_ON, bits);
- UC1609_CS_SetHigh;
-}
-
-
-// Desc: Scroll the displayed image up by SL rows. 
-//The valid SL value is between 0 (for no
-//scrolling) and (64). 
-//Setting SL outside of this range causes undefined effect on the displayed
-//image.
-// Param1: bits 0-64 line number y-axis
-// Desc: Rotates the display 
-// Set LC[2:1] for COM (row) mirror (MY), SEG (column) mirror (MX).
-// Param1: 4 possible values 000 010 100 110 (defined)
-// If Mx is changed the buffer must BE updated
-void ERM19264_UC1609::LCDrotate(uint8_t rotatevalue) 
-{
- UC1609_CS_SetLow;
-  switch (rotatevalue)
-  {
-      case 0: rotatevalue = 0; break;
-      case 0x02: rotatevalue = UC1609_ROTATION_FLIP_ONE; break;
-      case 0x04: rotatevalue = UC1609_ROTATION_NORMAL; break;
-      case 0x06: rotatevalue = UC1609_ROTATION_FLIP_TWO; break;
-      default: rotatevalue = UC1609_ROTATION_NORMAL; break;
-  }
-  send_command(UC1609_LCD_CONTROL, rotatevalue);
- UC1609_CS_SetHigh;
-}
-
-// Desc: invert the display
-// Param1: bits, 1 invert , 0 normal
-void ERM19264_UC1609::LCDscroll (uint8_t bits)
-{
- UC1609_CS_SetLow;
-  send_command(UC1609_SCROLL, bits);
- UC1609_CS_SetHigh;
-}
-
-void ERM19264_UC1609::invertDisplay (uint8_t bits) 
-{
- UC1609_CS_SetLow;
-  send_command(UC1609_INVERSE_DISPLAY, bits);
- UC1609_CS_SetHigh;
-}
-
-// Desc: turns on all Pixels
-// Param1: bits Set DC[1] to force all SEG drivers to output ON signals
-// 1 all on ,  0 all off
-void ERM19264_UC1609::LCD_allpixelsOn(uint8_t bits) 
-{
- UC1609_CS_SetLow;
-  send_command(UC1609_ALL_PIXEL_ON, bits);
- UC1609_CS_SetHigh;
-}
-
-// Desc: Fill the screen NOT the buffer with a datapattern 
-// Param1: datapattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
-// Param2: optional delay in microseconds can be set to zero normally.
-void ERM19264_UC1609::LCDFillScreen(uint8_t dataPattern=0, uint8_t delay=0) 
-{
- UC1609_CS_SetLow;
-  uint16_t numofbytes = LCD_WIDTH * (LCD_HEIGHT /8); // width * height
-  for (uint16_t i = 0; i < numofbytes; i++) 
-  {
-    send_data(dataPattern);
-    //delayMicroseconds(delay); //TODO
-  }
-UC1609_CS_SetHigh;
-}
-
-// Desc: Fill the chosen page(1-8)  with a datapattern 
-// Param1: datapattern can be set to 0 to FF (not buffer)
-void ERM19264_UC1609::LCDFillPage(uint8_t dataPattern=0) 
-{
- UC1609_CS_SetLow;
-  uint16_t numofbytes = ((LCD_WIDTH * (LCD_HEIGHT /8))/8); // (width * height/8)/8 = 192 bytes
-  for (uint16_t i = 0; i < numofbytes; i++) 
-  {
-      send_data(dataPattern);
-  }
- UC1609_CS_SetHigh;
-}
-
-//Desc: Draw a bitmap in PROGMEM to the screen
-//Param1: x offset 0-192
-//Param2: y offset 0-64
-//Param3: width 0-192
-//Param4 height 0-64
-//Param5 the bitmap
-void ERM19264_UC1609::LCDBitmap(int16_t x, int16_t y, uint8_t w, uint8_t h, const uint8_t* data) 
-{
- UC1609_CS_SetLow;
-
-  uint8_t tx, ty; 
-  uint16_t offset = 0; 
-  uint8_t column = (x < 0) ? 0 : x;
-  uint8_t page = (y < 0) ? 0 : y >>3;
-
-  for (ty = 0; ty < h; ty = ty + 8) 
-  {
-        if (y + ty < 0 || y + ty >= LCD_HEIGHT) {continue;}
-        send_command(UC1609_SET_COLADD_LSB, (column & 0x0F)); 
-        send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
-        send_command(UC1609_SET_PAGEADD, page++); 
-
-        for (tx = 0; tx < w; tx++) 
-        {
-              if (x + tx < 0 || x + tx >= LCD_WIDTH) {continue;}
-              offset = (w * (ty >> 3)) + tx; 
-              send_data(data[offset]);
-        }
-  }
-UC1609_CS_SetHigh;
-}
-
-// Desc: Checks if software SPI is on
-// Returns: true 1 if hardware SPi on , false 0 for software spi
-bool ERM19264_UC1609::isHardwareSPI() {
-  return (_SPI_Hardware);
-}
-
-// Desc: used in software SPI mode to shift out data
-// Param1: the byte to go out
-void ERM19264_UC1609::CustomshiftOut(uint8_t value)
-{
-    uint8_t i;
-
-    for (i = 0; i < 8; i++)  {
-    	if (!!(value & (1 << (7 - i))))
-			HAL_GPIO_WritePin(GPIOA, SWMOSI_Pin,GPIO_PIN_SET);
-    	else
-    		HAL_GPIO_WritePin(GPIOA, SWMOSI_Pin,GPIO_PIN_RESET);
-    	HAL_GPIO_WritePin(GPIOA, SWSPICLK_Pin,GPIO_PIN_SET);
-        //delayMicroseconds(UC1609_HIGHFREQ_DELAY);
-    	HAL_GPIO_WritePin(GPIOA, SWSPICLK_Pin,GPIO_PIN_RESET);
-        //delayMicroseconds(UC1609_HIGHFREQ_DELAY);
-    }
-}
-
-//Desc: Send data byte with SPI to UC1609C
-//Param1: the data byte
-void ERM19264_UC1609::send_data(uint8_t data)
-{
-  if (isHardwareSPI())
-  {
+/*!
+	 @brief Send data byte with SPI to UC1609
+	 @param byte the data byte to send
+*/
+void ERM19264_UC1609::send_data(uint8_t data) {
 	HAL_SPI_Transmit(_hspi1, &data, 1, 100);
-  }else
-  {
-    CustomshiftOut(data); //Software SPI
-  }
-} 
- 
-// ******************************************************
-// Functions below not & needed for no_buffer mode 
-#ifndef NO_BUFFER
-
-// Desc init the Multibuffer struct
-// Param 1 Pointer to a struct
-// Param 2 Pointer to buffer array data(arrays decay to  pointers)
-// Param 3. width of buffer
-// Param 4. height of buffer
-// Param 5. x offset of buffer
-// Param 6. y offset of buffer
-#ifdef MULTI_BUFFER
-void ERM19264_UC1609::LCDinitBufferStruct(MultiBuffer* mystruct, uint8_t* mybuffer, uint8_t w,  uint8_t h, int16_t  x, int16_t y)
-{
-   mystruct->screenbitmap = mybuffer; // point it to the buffer
-   mystruct->width = w ;
-   mystruct->height = h;
-   mystruct->xoffset = x;
-   mystruct->yoffset = y;
-}
-#endif
-
-//Desc: updates the buffer i.e. writes it to the screen
-void ERM19264_UC1609::LCDupdate() 
-{
-
-#ifdef MULTI_BUFFER
-      LCDBuffer( this->ActiveBuffer->xoffset, this->ActiveBuffer->yoffset, this->ActiveBuffer->width, this->ActiveBuffer->height, (uint8_t*) this->ActiveBuffer->screenbitmap); 
-      return;
-#endif
-
-#ifdef SINGLE_BUFFER
-  uint8_t x = 0; uint8_t y = 0; uint8_t w = this->bufferWidth; uint8_t h = this->bufferHeight;
-  LCDBuffer( x,  y,  w,  h, (uint8_t*) this->buffer);
-#endif
 }
 
-//Desc: clears the buffer i.e. does NOT write to the screen
-void ERM19264_UC1609::LCDclearBuffer()
-{
-#ifdef MULTI_BUFFER
-   memset( this->ActiveBuffer->screenbitmap, 0x00, (this->ActiveBuffer->width * (this->ActiveBuffer->height/ 8))  ); 
-   return;
-#endif
 
-#ifdef SINGLE_BUFFER
-  memset( this->buffer, 0x00, (this->bufferWidth * (this->bufferHeight /8))  ); 
-#endif
+/*!
+	 @brief updates the LCD  i.e. writes the  shared buffer to the active screen
+		pointed to by ActiveBuffer
+*/
+void ERM19264_UC1609::LCDupdate() {
+	LCDBuffer( this->ActiveBuffer->xoffset, this->ActiveBuffer->yoffset, this->ActiveBuffer->width, this->ActiveBuffer->height, (uint8_t*) this->ActiveBuffer->screenBuffer);
 }
 
-//Desc: Draw a bitmap to the screen
-//Param1: x offset 0-192
-//Param2: y offset 0-64
-//Param3: width 0-192
-//Param4 height 0-64
-//Param5 the bitmap
-void ERM19264_UC1609::LCDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data) 
-{
- UC1609_CS_SetLow;
-
-  uint8_t tx, ty; 
-  uint16_t offset = 0; 
-  uint8_t column = (x < 0) ? 0 : x;
-  uint8_t page = (y < 0) ? 0 : y/8;
-
-  for (ty = 0; ty < h; ty = ty + 8) 
-  {
-    if (y + ty < 0 || y + ty >= LCD_HEIGHT) {continue;}
-    
-    send_command(UC1609_SET_COLADD_LSB, (column & 0x0F)); 
-    send_command(UC1609_SET_COLADD_MSB, (column & 0XF0) >> 4); 
-    send_command(UC1609_SET_PAGEADD, page++); 
- 
-    for (tx = 0; tx < w; tx++) 
-    {
-          if (x + tx < 0 || x + tx >= LCD_WIDTH) {continue;}
-          offset = (w * (ty /8)) + tx; 
-          send_data(data[offset++]);
-    }
-  }
-  
-UC1609_CS_SetHigh;
+/*!
+	 @brief clears the buffer of the active screen pointed to by ActiveBuffer
+	 @note Does NOT write to the screen
+*/
+void ERM19264_UC1609::LCDclearBuffer() {
+	 memset( this->ActiveBuffer->screenBuffer, 0x00, (this->ActiveBuffer->width * (this->ActiveBuffer->height/ 8))  );
 }
 
-// Desc: Draws a Pixel to the screen overides the custom graphics library
-// Passed x and y co-ords and colour of pixel.
-void ERM19264_UC1609::drawPixel(int16_t x, int16_t y, uint8_t colour) 
-{
-    
-#ifdef MULTI_BUFFER
-  if ((x < 0) || (x >= this->ActiveBuffer->width) || (y < 0) || (y >= this->ActiveBuffer->height)) {
-    return;
-  }
-      uint16_t offset = (this->ActiveBuffer->width * (y/8)) + x; 
-      switch (colour)
-      {
-        case FOREGROUND: this->ActiveBuffer->screenbitmap[offset] |= (1 << (y & 7)); break;
-        case BACKGROUND: this->ActiveBuffer->screenbitmap[offset] &= ~(1 << (y & 7)); break;
-        case INVERSE: this->ActiveBuffer->screenbitmap[offset] ^= (1 << (y & 7)); break;
-      }
-    return;
-#endif
-    
-#ifdef SINGLE_BUFFER
-  if ((x < 0) || (x >= this->bufferWidth) || (y < 0) || (y >= this->bufferHeight)) {
-    return;
-  }
-      uint16_t tc = (bufferWidth * (y /8)) + x; 
-      switch (colour)
-      {
-        case FOREGROUND:  this->buffer[tc] |= (1 << (y & 7)); break;
-        case BACKGROUND:  this->buffer[tc] &= ~(1 << (y & 7)); break;
-        case INVERSE: this->buffer[tc] ^= (1 << (y & 7)); break;
-      }
-#endif
+/*!
+	 @brief Draw a data array  to the screen
+	 @param x offset 0-192
+	 @param y offset 0-64
+	 @param w width 0-192
+	 @param h height 0-64
+	 @param data pointer to the data array
+	 @note Called by LCDupdate internally to write buffer to screen , can be called standalone 	as well
+*/
+void ERM19264_UC1609::LCDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h,
+		uint8_t *data) {
+	UC1609_CS_SetLow;
+
+	uint8_t tx, ty;
+	uint16_t offset = 0;
+	uint8_t column = (x < 0) ? 0 : x;
+	uint8_t page = (y < 0) ? 0 : y / 8;
+
+	for (ty = 0; ty < h; ty = ty + 8) {
+		if (y + ty < 0 || y + ty >= _LCD_HEIGHT) {
+			continue;
+		}
+
+		send_command(UC1609_SET_COLADD_LSB, (column & 0x0F));
+		send_command(UC1609_SET_COLADD_MSB, (column & 0XF0) >> 4);
+		send_command(UC1609_SET_PAGEADD, page++);
+
+		for (tx = 0; tx < w; tx++) {
+			if (x + tx < 0 || x + tx >= _LCD_WIDTH) {
+				continue;
+			}
+			offset = (w * (ty / 8)) + tx;
+			send_data(data[offset++]);
+		}
+	}
+
+	UC1609_CS_SetHigh;
 }
 
-// ***************************************************
-#else 
-//  these functions are not needed by buffers modes
-// and only used in "no buffer" mode
-// ***********************************************
+/*!
+	@brief Draws a Pixel to the screen , overrides the  graphics library
+	@param x x co-ord of pixel
+	@param y y co-ord of pixel
+	@param colour colour of  pixel
+*/
+void ERM19264_UC1609::drawPixel(int16_t x, int16_t y, uint8_t colour) {
 
-// Desc: goes to XY position
-// Param1 : coloumn 0-192
-// Param2  : page 0-7
-void ERM19264_UC1609::LCDNoBufferGotoXY(uint8_t column , uint8_t page)
-{
-        UC1609_CS_SetLow;
-        send_command(UC1609_SET_COLADD_LSB, (column & 0x0F)); 
-        send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
-        send_command(UC1609_SET_PAGEADD, page++); 
-        UC1609_CS_SetHigh;
+	if ((x < 0) || (x >= this->ActiveBuffer->width) || (y < 0)
+			|| (y >= this->ActiveBuffer->height)) {
+		return;
+	}
+	int16_t temp;
+	uint8_t RotateMode = getRotation();
+	switch (RotateMode) {
+	case 1:
+		temp = x;
+		x = WIDTH - 1 - y;
+		y = temp;
+	break;
+	case 2:
+		x = WIDTH - 1 - x;
+		y = HEIGHT - 1 - y;
+	break;
+	case 3:
+		temp = x;
+		x = y;
+		y = HEIGHT - 1 - temp;
+	break;
+	}
+
+	uint16_t offset = (this->ActiveBuffer->width * (y / 8)) + x;
+	switch (colour) {
+	case FOREGROUND: this->ActiveBuffer->screenBuffer[offset] |= (1 << (y & 7)); break;
+	case BACKGROUND: this->ActiveBuffer->screenBuffer[offset] &= ~(1 << (y & 7)); break;
+	case INVERSE: this->ActiveBuffer->screenBuffer[offset] ^= (1 << (y & 7)); break;
+	}
+	return;
 }
 
-// Desc: draws passed character.
-// Param1: character 'A' or number in  the ASCII table 1-127(default)
-void ERM19264_UC1609::LCDNoBufferChar(unsigned char  character)
-{
-   UC1609_CS_SetLow;
-   UC1609_FONTPADDING;
-
-   for (uint8_t column = 0 ; column <  UC1609_FONTWIDTH ; column++)
-    {
-	   send_data((uint8_t)(pFontDefaultptr[(character*UC1609_FONTWIDTH) + column]));
-    }
-    UC1609_FONTPADDING;
-    UC1609_CS_SetHigh;
+/*!
+	 @brief Goes to X Y position
+	 @param  column Column 0-192
+	 @param page 0-7
+*/
+void ERM19264_UC1609::LCDGotoXY(uint8_t column, uint8_t page) {
+	UC1609_CS_SetLow;
+	send_command(UC1609_SET_COLADD_LSB, (column & 0x0F));
+	send_command(UC1609_SET_COLADD_MSB, (column & 0xF0) >> 4);
+	send_command(UC1609_SET_PAGEADD, page++);
+	UC1609_CS_SetHigh;
 }
 
-// Desc: draws passed  character array
-// Param1: pointer to start of character array
-void ERM19264_UC1609::LCDNoBufferString(const unsigned char *characters)
-{
-    while (*characters)
-    LCDNoBufferChar(*characters++);
-}
-#endif
+
 //***********************************************

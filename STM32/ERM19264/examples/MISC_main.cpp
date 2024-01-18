@@ -3,11 +3,7 @@
  // Example file name : main.cpp
  // Description:
  // Test file for ERM19264_UC1609_library,
- // multi buffer mode. 
- // *****************************
- // NOTES :
- // (1) This is for software SPI
- // ******************************
+ // .Misc functions
  */
 
 /* USER CODE END Header */
@@ -50,20 +46,27 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-void display_Right(MultiBuffer *targetbuffer);
-void display_Left(MultiBuffer *targetbuffer);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-ERM19264_UC1609 mylcd(false);
-uint16_t count = 0;
-#define VbiasPOT 0x49 //Constrast 00 to FE , 0x49 is default. user adjust
+// LCD related
+#define VbiasPOT 0x49 //Contrast 00 to FE , 0x49 is default. user adjust
 #define LCDRAMADDRCTRL 0x02  // RAM address control: Range 0-0x07, optional, default 0x02
 #define MYLCDHEIGHT 64
 #define MYLCDWIDTH  192
+#define FULLSCREEN (MYLCDWIDTH * (MYLCDHEIGHT/8))
+ERM19264_UC1609 myLCD(MYLCDWIDTH, MYLCDHEIGHT);
+// test timing related
 #define DisplayDelay1 5000
 #define DisplayDelay2 0
+// Define a half screen sized buffer
+uint8_t ScreenBuffer[FULLSCREEN]; // 1536 bytes
+// Instantiate  a screen object
+// (buffer, width, height, x_offset, y-offset)
+ERM19264_UC1609_Screen Screen(ScreenBuffer, MYLCDWIDTH,
+		MYLCDHEIGHT, 0, 0);
 /* USER CODE END 0 */
 
 /**
@@ -98,10 +101,10 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 
 	uint8_t buf[12];
-	mylcd.LCDbegin(LCDRAMADDRCTRL, VbiasPOT, &hspi1); // initialize the LCD
-	mylcd.LCDFillScreen(0xE5, 0); // Fill the screen with a a pattern , "just for splashscreen effect"
+	myLCD.LCDbegin(LCDRAMADDRCTRL, VbiasPOT, &hspi1); // initialize the LCD
+	myLCD.LCDFillScreen(0xE5); // Fill the screen with a a pattern , "just for splashscreen effect"
 	HAL_Delay(1500);
-	mylcd.LCDFillScreen(0x00, 0); // Clear the screen
+	myLCD.LCDFillScreen(0x00); // Clear the screen
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -112,26 +115,124 @@ int main(void) {
 
 	while (1) {
 
-		mylcd.setTextColor(FOREGROUND);
-		mylcd.setTextSize(1);
-		// Define a half screen sized buffer
-		uint8_t screenBuffer[(MYLCDWIDTH * (MYLCDHEIGHT / 8)) / 2]; // 1536/2 = 768 bytes
+		myLCD.ActiveBuffer = &Screen;
+		myLCD.LCDclearBuffer(); // clear the buffer
 
-		MultiBuffer left_side; // Declare a multi buffer struct for left side of screen
-		// Intialise that struct (&struct, buffer, w, h, x_offset, y-offset)
-		mylcd.LCDinitBufferStruct(&left_side, screenBuffer, MYLCDWIDTH / 2,
-				MYLCDHEIGHT, 0, 0);
+		// Set text parameters
+		myLCD.setTextColor(FOREGROUND);
+		myLCD.setTextSize(1);
 
-		MultiBuffer right_side; // Declare a multi buffer struct for right side of screen
-		// Intialise that struct (&struct, buffer, w, h, x_offset, y-offset)
-		mylcd.LCDinitBufferStruct(&right_side, screenBuffer, MYLCDWIDTH / 2,
-				MYLCDHEIGHT, MYLCDWIDTH / 2, 0);
+		// Test 1 LCD all pixels on
+		myLCD.setCursor(20, 30);
+		myLCD.print("All Pixels on");
+		myLCD.LCDupdate();
+		HAL_Delay(4000);
+		myLCD.LCDclearBuffer();
+		myLCD.LCDupdate();
+		myLCD.LCDAllpixelsOn(1);
+		HAL_Delay(2000);
+		myLCD.LCDAllpixelsOn(0);
+		HAL_Delay(2000);
 
-		display_Left(&left_side);
+		// Test 2 inverse
+		myLCD.setCursor(20, 30);
+		myLCD.print("inverse test  ");
+		myLCD.LCDupdate();
+		myLCD.LCDInvertDisplay(0); // Normal
+		HAL_Delay(2000);
+		myLCD.LCDInvertDisplay(1); // Inverted
+		HAL_Delay(4000);
+		myLCD.LCDInvertDisplay(0);
 
-		display_Right(&right_side);
-		count++;
-		HAL_Delay(1);
+		// Test3 LCD rotate
+		myLCD.LCDclearBuffer();
+		myLCD.setCursor(20, 30);
+		myLCD.print("rotate cmd test");
+		myLCD.LCDupdate();
+		HAL_Delay(2000);
+		myLCD.LCDrotate(UC1609_ROTATION_FLIP_ONE);
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDrotate(UC1609_ROTATION_FLIP_TWO);
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDrotate(UC1609_ROTATION_FLIP_THREE);
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDrotate(UC1609_ROTATION_NORMAL);
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+
+		// Test4 LCD scroll
+		myLCD.LCDclearBuffer();
+		//myLCD.LCDupdate();
+		myLCD.setCursor(0, 40);
+		myLCD.print("scroll test");
+		for (uint8_t i = 0; i < 62; i++) {
+			myLCD.LCDscroll(i);
+			myLCD.LCDupdate();
+			HAL_Delay(50);
+		}
+		myLCD.LCDscroll(0);
+
+		//Test5 LCD enable and disable
+		myLCD.LCDclearBuffer();
+		myLCD.setCursor(0, 30);
+		myLCD.print("LCD Disable test");
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDEnable(0);
+		HAL_Delay(5000);
+		myLCD.LCDEnable(1);
+
+
+
+		// rotate buffer
+		myLCD.LCDclearBuffer();
+		myLCD.setCursor(5, 30);
+		myLCD.print("rotate Buffer test");
+		myLCD.LCDupdate();
+		HAL_Delay(2000);
+		myLCD.LCDclearBuffer();
+
+		myLCD.setCursor(5, 5);
+		myLCD.setRotation(LCD_Degrees_0);
+		myLCD.print("rotate 0");
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDclearBuffer();
+
+		myLCD.setRotation(LCD_Degrees_90);
+		myLCD.setCursor(5, 5);
+		myLCD.print("rotate 90");
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDclearBuffer();
+
+		myLCD.setRotation(LCD_Degrees_180);
+		myLCD.setCursor(5, 5);
+		myLCD.print("rotate 180");
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.LCDclearBuffer();
+
+		myLCD.setRotation(LCD_Degrees_270);
+		myLCD.setCursor(5, 5);
+		myLCD.print("rotate  270");
+		myLCD.LCDupdate();
+		HAL_Delay(5000);
+		myLCD.setRotation(LCD_Degrees_0); //back to normal rotation
+		myLCD.LCDclearBuffer();
+
+
+		myLCD.setCursor(20, 30);
+		myLCD.print("End");
+		myLCD.LCDupdate();
+		HAL_Delay(2000);
+		myLCD.LCDPowerDown();
+		while (1) {
+			HAL_Delay(10); // tests over, loop here forever
+		}
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -282,44 +383,6 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 // Function to display left hand side buffer
-void display_Left(MultiBuffer *targetbuffer) {
-	mylcd.ActiveBuffer = targetbuffer; // set target buffer object
-	mylcd.LCDclearBuffer();
-	mylcd.setCursor(0, 0);
-	mylcd.print("Left Buffer:");
-
-	mylcd.setCursor(0, 10);
-	mylcd.print("96 * 64/8 = 768");
-
-	mylcd.setCursor(0, 20);
-	mylcd.print("x * y/8 = 768");
-
-	mylcd.setCursor(0, 30);
-	mylcd.print(count);
-
-	mylcd.setCursor(0, 40);
-	mylcd.print("SW SPI");
-	mylcd.setCursor(0, 50);
-	mylcd.print("V 1.4.0");
-	mylcd.drawFastVLine(92, 0, 63, FOREGROUND);
-	mylcd.LCDupdate();
-}
-
-// Function to display right hand side buffer
-void display_Right(MultiBuffer *targetbuffer) {
-	mylcd.ActiveBuffer = targetbuffer; // set target buffer object
-	mylcd.LCDclearBuffer();
-	mylcd.setCursor(0, 0);
-	mylcd.print("Right buffer:");
-
-	mylcd.fillRect(0, 10, 20, 20, FOREGROUND);
-	mylcd.fillCircle(40, 20, 10, FOREGROUND);
-	mylcd.fillTriangle(60, 30, 70, 10, 80, 30, FOREGROUND);
-	mylcd.drawRoundRect(10, 40, 60, 20, 10, FOREGROUND);
-
-	mylcd.LCDupdate();
-}
-
 /* USER CODE END 4 */
 
 /**

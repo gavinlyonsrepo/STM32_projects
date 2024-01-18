@@ -1,29 +1,20 @@
-/*
-  Print.h - Base class that provides print() and println()
-  Copyright (c) 2008 David A. Mellis.  All right reserved.
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+/*!
+  @file     Print.hpp
+  @brief    Base class that provides print() and println() for  ERM19264_UC1609_PICO library
+  @note     Port of arduino built-in print class, G Lyons 2022.
 */
 
 #ifndef Print_h
 #define Print_h
 
 #include <inttypes.h>
-#include <Printable.hpp>
 #include <stdio.h> // for size_t
 
-#include <WString.hpp>
-
-#define PGM_P const char*
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib_noniso.h>
+#include <string>
 
 #define DEC 10
 #define HEX 16
@@ -57,12 +48,7 @@ class Print
       return write((const uint8_t *)buffer, size);
     }
 
-    // default to zero, meaning "a single write may block"
-    // should be overriden by subclasses with buffering
-    virtual int availableForWrite() { return 0; }
-
-    size_t print(const __FlashStringHelper *);
-    size_t print(const String &);
+    size_t print(const std::string &);
     size_t print(const char[]);
     size_t print(char);
     size_t print(unsigned char, int = DEC);
@@ -71,10 +57,8 @@ class Print
     size_t print(long, int = DEC);
     size_t print(unsigned long, int = DEC);
     size_t print(double, int = 2);
-    size_t print(const Printable&);
 
-    size_t println(const __FlashStringHelper *);
-    size_t println(const String &s);
+    size_t println(const std::string &s);
     size_t println(const char[]);
     size_t println(char);
     size_t println(unsigned char, int = DEC);
@@ -83,10 +67,8 @@ class Print
     size_t println(long, int = DEC);
     size_t println(unsigned long, int = DEC);
     size_t println(double, int = 2);
-    size_t println(const Printable&);
     size_t println(void);
 
-    virtual void flush() { /* Empty implementation for backward compatibility */ }
 };
 
 #endif

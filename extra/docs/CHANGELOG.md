@@ -21,3 +21,6 @@
 
 * Feb 2023 
 	* Added Hd44780 LCD library. 
+
+* Jan 2024
+	* Upgrade ERM19264_UC1609C library to version 1.8

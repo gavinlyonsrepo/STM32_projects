@@ -10,11 +10,10 @@ Overview
 3. ASCII text strings and character text display 
 4. Graphics library included.
 5. Sleep mode.
-6. 3 different modes: Multi-buffer , single buffer , light weight text only
-7. Custom bitmaps supported.
-8. Hardware or software SPI.
-9. 8 fonts.
-10. print() function which can handle multiple data types 
+6. Bitmaps supported.
+7. Hardware
+9. 12 fonts.
+10. Print class which can handle multiple data types 
 
 * Author: Gavin Lyons
 
@@ -27,7 +26,7 @@ Note
 
 This library is a port of the arduino library at [LINK](https://github.com/gavinlyonsrepo/ERM19264_UC1609)
 Full details there. The  examples files in examples folder correspond somewhat to the example files at the arduino repo examples folder. Simply replace the main.cpp with this file for the model user wants.
-The default main.cpp is "HWSPI_MULTIBUFFER_main.cpp"
+The default main.cpp is "MULTISCREEN_main.cpp"
 
 Connections
 ------------------------------
@@ -40,15 +39,4 @@ Connections Hardware SPI
 4. CS PA10
 5. Reset PA9
 
-Connections Software SPI 
-
-1. CLk PA11
-2. Data PA12
-3. CD PA8
-4. CS PA10
-5. Reset PA9
-
-No other changes are required to the peripheral default setup of the Nucleo board by the IDE
-besides configure the SPI and  GPIO. SPI settings are in main.cpp.
-
- 
+No other changes are required to the peripheral default setup of the Nucleo board by the IDE, besides configure the SPI and  GPIO. SPI settings are in main.cpp.

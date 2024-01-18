@@ -1,31 +1,13 @@
-/*
- Print.cpp - Base class that provides print() and println()
- Copyright (c) 2008 David A. Mellis.  All right reserved.
- 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
- 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
- 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
- Modified 23 November 2006 by David A. Mellis
- Modified 03 August 2015 by Chuck Todd
- */
+/*!
+  @file     Print.cpp
+  @brief    Base class that provides print() and println() for  ERM19264_UC1609_PICO library
+  @note     Port of arduino built-in print class, G Lyons 2022.
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
-
 #include <Print.hpp>
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -41,21 +23,8 @@ size_t Print::write(const uint8_t *buffer, size_t size)
   return n;
 }
 
-size_t Print::print(const __FlashStringHelper *ifsh)
-{
-  PGM_P p = reinterpret_cast<PGM_P>(ifsh);
-  size_t n = 0;
-  while (1) {
-    //unsigned char c = pgm_read_byte(p++);
-	unsigned char c = *p++;
-    if (c == 0) break;
-    if (write(c)) n++;
-    else break;
-  }
-  return n;
-}
 
-size_t Print::print(const String &s)
+size_t Print::print(const std::string &s)
 {
   return write(s.c_str(), s.length());
 }
@@ -112,24 +81,14 @@ size_t Print::print(double n, int digits)
   return printFloat(n, digits);
 }
 
-size_t Print::println(const __FlashStringHelper *ifsh)
-{
-  size_t n = print(ifsh);
-  n += println();
-  return n;
-}
 
-size_t Print::print(const Printable& x)
-{
-  return x.printTo(*this);
-}
 
 size_t Print::println(void)
 {
   return write("\r\n");
 }
 
-size_t Print::println(const String &s)
+size_t Print::println(const std::string &s)
 {
   size_t n = print(s);
   n += println();
@@ -192,12 +151,6 @@ size_t Print::println(double num, int digits)
   return n;
 }
 
-size_t Print::println(const Printable& x)
-{
-  size_t n = print(x);
-  n += println();
-  return n;
-}
 
 // Private Methods /////////////////////////////////////////////////////////////
 
@@ -225,8 +178,8 @@ size_t Print::printFloat(double number, uint8_t digits)
 { 
   size_t n = 0;
   
-  if (isnan(number)) return print("nan");
-  if (isinf(number)) return print("inf");
+  if (std::isnan(number)) return print("nan");
+  if (std::isinf(number)) return print("inf");
   if (number > 4294967040.0) return print ("ovf");  // constant determined empirically
   if (number <-4294967040.0) return print ("ovf");  // constant determined empirically
   
