@@ -19,11 +19,11 @@
 #define UC1609_Font_Four // (4) wide (NO LOWERCASE)
 #define UC1609_Font_Five // (5) tiny
 #define UC1609_Font_Six // (6) HomeSpun
-#define UC1609_Font_Seven // (7) big numbers ( extended Nnumeric )
-#define UC1609_Font_Eight // (8) Med numbers (extended Nnumeric )
+#define UC1609_Font_Seven // (7) big numbers ( extended Numeric )
+#define UC1609_Font_Eight // (8) Med numbers (extended Numeric )
 #define UC1609_Font_Nine // (9) Arial round
-#define UC1609_Font_Ten   // (9) Arial bold
-#define UC1609_Font_Eleven  //(10) Mia
+#define UC1609_Font_Ten   // (10) Arial bold
+#define UC1609_Font_Eleven  //(11) Mia
 #define UC1609_Font_Twelve  // (12) dedica
 
 // ****** END OF FONT DEFINE SECTION ******  

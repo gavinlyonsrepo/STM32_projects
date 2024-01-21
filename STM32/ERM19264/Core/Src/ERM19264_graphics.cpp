@@ -536,7 +536,7 @@ int16_t custom_graphics::height(void) const {
 	@param bg background color
 	@return 0 for success , non-zero forfailure
 		9 = Wrong font. 4 = character out of screen bounds. 3= character out of ASCII font range.
-	@note for font 7-10 only
+	@note for font 7-12 only
 */
 uint8_t custom_graphics::drawChar(uint8_t x, uint8_t y, uint8_t character, uint8_t color , uint8_t bg)
 {
@@ -659,7 +659,7 @@ uint8_t custom_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t col
 
 /*!
 	@brief   Set the font type
-	@param FontNumber  enum OLED_FONT_TYPE_e
+	@param FontNumber  enum LCD_FONT_TYPE_e
 */
 void custom_graphics::setFontNum(LCDFontType_e FontNumber) {
 
@@ -850,13 +850,11 @@ uint8_t custom_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t col
 	// check Correct font number
 	if(_FontNumber >= UC1609Font_Bignum)
 	{
-		print("Error drawText 2: Wrong font number , must be 1-6\n");
 		return 2;
 	}
 	// Check for null pointer
 	if(pText == nullptr)
 	{
-		print("Error drawText 3 :String array is not valid pointer\n");
 		return 3;
 	}
 	uint8_t cursor_x, cursor_y;
@@ -872,7 +870,6 @@ uint8_t custom_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t col
 		}
 		if(drawChar(cursor_x, cursor_y, *pText, color, bg, size) != 0)
 		{
-			print("Error drawText 4: Method drawChar failed\n");
 			return 4;
 		}
 		cursor_x = cursor_x + size * (_CurrentFontWidth + 1);
