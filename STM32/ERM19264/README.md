@@ -11,7 +11,7 @@ Overview
 4. Graphics library included.
 5. Sleep mode.
 6. Bitmaps supported.
-7. Hardware
+7. Hardware SPI
 9. 12 fonts.
 10. Print class which can handle multiple data types 
 
