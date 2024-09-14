@@ -398,6 +398,25 @@ void Test0(void) {
     TFTdrawText(0, 102, "Home 6", ST7735_YELLOW, ST7735_BLACK, 2);
     HAL_Delay(TEST_DELAY5);
     TFTfillScreen(ST7735_BLACK);
+
+    TFTFontNum(TFTFont_Bignum);
+    TFTdrawText2(2, 4, "-12.3", ST7735_WHITE, ST7735_BLACK);
+    TFTFontNum(TFTFont_Mednum);
+    TFTdrawText2(2, 40, "-14.9", ST7735_BLACK, ST7735_YELLOW);
+    TFTFontNum(TFTFont_ArialRound);
+    TFTdrawText2(2, 72, "Arial R", ST7735_GREEN, ST7735_BLACK);
+    HAL_Delay(TEST_DELAY5);
+    TFTfillScreen(ST7735_BLACK);
+
+    TFTFontNum(TFTFont_ArialBold);
+    TFTdrawText2(2, 4, "Arial B", ST7735_WHITE, ST7735_BLACK);
+    TFTFontNum(TFTFont_Mia);
+    TFTdrawText2(2, 40, "Mia Font", ST7735_BLACK, ST7735_GREEN);
+    TFTFontNum(TFTFont_Dedica);
+    TFTdrawText2(2, 72, "Dedica Font", ST7735_GREEN, ST7735_BLACK);
+    HAL_Delay(TEST_DELAY5);
+    TFTfillScreen(ST7735_BLACK);
+
     TFTFontNum(TFTFont_Default);
 }
 
@@ -621,7 +640,7 @@ void Test12(void)
 #ifdef TFT_BITMAP_BICOLOUR
  extern const uint8_t * pBackUpIconptr; // defined in ST7735_TFT_BITMAPDATA.c
 
- TFTdrawBitmap(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, pBackUpIconptr);
+ TFTdrawBitmap(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, pBackUpIconptr, 128*(128/8));
  HAL_Delay(TEST_DELAY5);
  TFTfillScreen(ST7735_BLACK);
 #endif

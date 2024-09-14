@@ -156,17 +156,54 @@ typedef enum
 	TFTFont_Seven_Seg = 3,
 	TFTFont_Wide = 4,
 	TFTFont_Tiny = 5,
-	TFTFont_Homespun = 6
+	TFTFont_Homespun = 6,
+	TFTFont_Bignum = 7,		/**< Bignum numbers only */
+	TFTFont_Mednum = 8,		/**< Mednum number only */
+	TFTFont_ArialRound = 9, /**< Arial round font */
+	TFTFont_ArialBold = 10, /**< Arial bold font */
+	TFTFont_Mia = 11,		/**< Mia font */
+	TFTFont_Dedica = 12		/**< dedica font */
 }ST7735_FontType_e; // Font type 1-6
 
+/*! Width of the font in bits each representing a bytes sized column*/
 typedef enum
 {
-    TFTFont_width_3 = 3, // tiny
-    TFTFont_width_4 = 4, // Seven seg
-    TFTFont_width_5 = 5, // default
-    TFTFont_width_7 = 7, // thick , homespun
-    TFTFont_width_8 = 8 // wide
-}ST7735_FontWidth_e; // width of the font in bytes, cols.
+	TFTFont_width_3 = 3,  /**< 3 tiny font */
+	TFTFont_width_4 = 4,  /**< 4 seven segment font */
+	TFTFont_width_5 = 5,  /**< 5 default font */
+	TFTFont_width_6 = 6,  /**< dedica font  */
+	TFTFont_width_7 = 7,  /**< 7 homespun & thick font*/
+	TFTFont_width_8 = 8,  /**< 8 wide & mia font*/
+	TFTFont_width_16 = 16 /**< 16 font 7-10*/
+}TFT_Font_width_e ;
+
+/*! font offset in the ASCII table*/
+typedef enum
+{
+	TFTFont_offset_none = 0x00,	 /**< extended ASCII */
+	TFTFont_offset_space = 0x20, /**< Starts at Space, alphanumeric */
+	TFTFont_offset_minus = 0x2D, /**< Starts at Minus, extended numeric */
+	TFTFont_offset_zero = 0x30	 /**< Starts at zero, numeric */
+}TFT_Font_offset_e;
+
+/*! Height of the font in bits*/
+typedef enum
+{
+	TFTFont_height_8 = 8,	/**< 8 bit font 1-6 at size 1*/
+	TFTFont_height_12 = 12, /**< 12 bit font 12 */
+	TFTFont_height_16 = 16, /**< 16 bit font 8, 10 11*/
+	TFTFont_height_24 = 24, /**< 24 bit font 9 */
+	TFTFont_height_32 = 32	/**< 32 bit font 7 */
+}ST7735_Font_height_e;
+
+/*! Number of ASCII characters in Font */
+typedef enum
+{
+	TFTFontLenNumeric = 14,			/**< extended Numeric 0x2D - 0x3A */
+	TFTFontLenAlphaNumNoLCase = 59, /**< reduced Alphanumeric 0x20-0x5A*/
+	TFTFontLenAlphaNum = 95,		/**< Full Alphanumeric 0x20-0x7E */
+	TFTFontLenAll = 255				/**< Full Range  0-0xFF */
+}ST7735_Font_Length_e ;
 
 typedef enum
 {
@@ -223,7 +260,7 @@ void TFTdrawRectWH(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
 
 void TFTfillRectangle(uint8_t, uint8_t, uint8_t, uint8_t, uint16_t);
 void TFTfillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
-void TFTfillRectangleBuffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
+uint8_t TFTfillRectangleBuffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
 void TFTfillScreen(uint16_t color);
 void TFTfillScreenBuffer(uint16_t color);
 
@@ -239,14 +276,16 @@ void TFTdrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
 void TFTfillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
 
 // Text
-void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
-void TFTsetTextWrap(bool w);
-void TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t bg, uint8_t size);
+uint8_t TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
+uint8_t TFTdrawChar2(uint8_t x, uint8_t y, uint8_t character, uint16_t color, uint16_t bg);
+uint8_t TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t bg, uint8_t size);
+uint8_t TFTdrawText2(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
 void TFTFontNum(ST7735_FontType_e FontNumber);
+void TFTsetTextWrap(bool w);
 
 // Bitmap & Icon
-void TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
-void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t bitmap[]);
+uint8_t TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
+uint8_t TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t bitmap[], uint16_t sizeOfBitmap);
 void TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *bitmap);
 void TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e);
 
