@@ -211,6 +211,7 @@ typedef enum
 	TFT_BMP_24 =24   // 24 bit per pixel
 }ST7735_BMPType_e; // bits per pixel of BMP.
 
+
 // ******** FUNCTION  PROTOTYPES ************ 
 
 
@@ -282,12 +283,13 @@ uint8_t TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t 
 uint8_t TFTdrawText2(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
 void TFTFontNum(ST7735_FontType_e FontNumber);
 void TFTsetTextWrap(bool w);
+uint16_t TFTgetLibVer(void);
 
 // Bitmap & Icon
 uint8_t TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
 uint8_t TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t bitmap[], uint16_t sizeOfBitmap);
-void TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *bitmap);
-void TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e);
+uint8_t TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *bitmap, uint16_t sizeOfBitmap);
+uint8_t TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e);
 
 #endif // file header guard 
 

@@ -76,11 +76,17 @@ uint16_t _heightStartTFT; // never change after first init
 
 SPI_HandleTypeDef * _hspi1;
 
+uint16_t TFTLibVersion = 171;
 // ********* Function Space *************
 
-// Desc: Write to SPI both Software and hardware SPI supported
+uint16_t TFTgetLibVer(void){
+	return TFTLibVersion;
+}
+
+
+// @brief Write to SPI both Software and hardware SPI supported
 // define TFT_SPI_HARDWARE toggles(see top of header file)
-// Param1:  byte to send
+// @param  byte to send
 
 void TFTspiWriteByte(uint8_t spidata) {
 #ifndef TFT_SPI_HARDWARE
@@ -91,8 +97,8 @@ void TFTspiWriteByte(uint8_t spidata) {
 
 }
 
-// Desc: Write an SPI command
-// Param1: command byte to send
+// @brief Write an SPI command
+// @param command byte to send
 
 void TFTwriteCommand(uint8_t cmd_) {
     TFT_DC_SetLow();
@@ -101,8 +107,8 @@ void TFTwriteCommand(uint8_t cmd_) {
     TFT_CS_SetHigh();
 }
 
-// Desc: Write SPI data
-// Param1: data byte to send
+// @brief Write SPI data
+// @param1: data byte to send
 
 void TFTwriteData(uint8_t data_) {
     TFT_DC_SetHigh();
@@ -111,7 +117,7 @@ void TFTwriteData(uint8_t data_) {
     TFT_CS_SetHigh();
 }
 
-// Desc: Function for Hardware Reset pin
+// @brief Function for Hardware Reset pin
 
 void TFTResetPIN() {
     TFT_RST_SetHigh();
@@ -122,7 +128,7 @@ void TFTResetPIN() {
     HAL_Delay(10);
 }
 
-// Desc: init sub-routine ST7735R Green Tab
+// @brief init sub-routine ST7735R Green Tab
 
 void TFTGreenTabInitialize() {
     TFTResetPIN();
@@ -138,7 +144,7 @@ void TFTGreenTabInitialize() {
     _TFTType = TFT_ST7735R_Green;
 }
 
-// Desc: init sub-routine ST7735R Green Tab
+// @brief init sub-routine ST7735R Green Tab
 
 void TFTRcmd2green() {
     TFTwriteCommand(ST7735_CASET);
@@ -153,7 +159,7 @@ void TFTRcmd2green() {
     TFTwriteData(0x9F + 0x01);
 }
 
-// Desc: ST7735R Red Tab Init Red PCB version
+// @brief ST7735R Red Tab Init Red PCB version
 
 void TFTRedTabInitialize() {
     TFTResetPIN();
@@ -170,7 +176,7 @@ void TFTRedTabInitialize() {
 
 }
 
-// Desc: Init Routine ST7735R Black Tab (ST7735S)
+// @brief Init Routine ST7735R Black Tab (ST7735S)
 
 void TFTBlackTabInitialize() {
     TFTResetPIN();
@@ -189,7 +195,7 @@ void TFTBlackTabInitialize() {
 }
 
 
-// Desc: init routine for ST7735B controller
+// @brief init routine for ST7735B controller
 
 void TFTST7735BInitialize() {
     TFTResetPIN();
@@ -204,7 +210,7 @@ void TFTST7735BInitialize() {
 }
 
 
-// Desc: init routine for ST7735B controller
+// @brief init routine for ST7735B controller
 
 void TFTBcmd() {
 	uint8_t seq1[] = {0x00, 0x06, 0x03};
@@ -261,7 +267,7 @@ void TFTBcmd() {
 }
 
 
-// Desc: init routine
+// @brief init routine
 
 void TFTRcmd1() {
 	uint8_t seq1[] = {0x01, 0x2C, 0x2D};
@@ -301,7 +307,7 @@ void TFTRcmd1() {
     TFTwriteData(0x05);
 }
 
-// Desc: init sub-routine
+// @brief init sub-routine
 
 void TFTRcmd2red() {
 	uint8_t seq1[] = {0x00, 0x00, 0x00, 0x7F};
@@ -312,7 +318,7 @@ void TFTRcmd2red() {
     TFTspiWriteBuffer(seq2, sizeof(seq2));
 }
 
-// Desc: init sub-routine
+// @brief init sub-routine
 
 void TFTRcmd3() {
 
@@ -329,11 +335,11 @@ void TFTRcmd3() {
 }
 
 /*
-  Desc SPI displays set an address window rectangle for blitting pixels
-  Param1:  Top left corner x coordinate
-  Param2:  y  Top left corner x coordinate
-  Param3:  w  Width of window
-  Param4:  h  Height of window
+  @brief SPI displays set an address window rectangle for blitting pixels
+  @param  x0Top left corner x coordinate
+  @param  y0  Top left corner x coordinate
+  @param  x1  Width of window
+  @param  y1  Height of window
  https://en.wikipedia.org/wiki/Bit_blit
  */
 void TFTsetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
@@ -350,10 +356,10 @@ void TFTsetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
     TFTwriteCommand(ST7735_RAMWR); // Write to RAM
 }
 
-//Desc: Draw a pixel to screen
-//Param1: X co-ord
-//Param2 Y  co-ord
-//Param3 color 565 16-bit
+//@brief Draw a pixel to screen
+//@param x co-ord
+//@param y  co-ord
+//@param color 565 16-bit
 
 void TFTdrawPixel(uint8_t x, uint8_t y, uint16_t color) {
     if ((x >= _widthTFT) || (y >= _heightTFT))
@@ -363,7 +369,7 @@ void TFTdrawPixel(uint8_t x, uint8_t y, uint16_t color) {
     TFTwriteData(color & 0xFF);
 }
 
-// Desc: fills a rectangle starting from coordinates (x,y) with width of w and height of h.
+// @brief fills a rectangle starting from coordinates (x,y) with width of w and height of h.
 
 void TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
     uint8_t hi, lo;
@@ -387,21 +393,22 @@ void TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color
     TFT_CS_SetHigh();
 }
 
-// Desc: Fills the whole screen with a given color.
+// @brief Fills the whole screen with a given color.
 // wraps  TFTfillRectangle
 void TFTfillScreen(uint16_t color) {
     TFTfillRectangle(0, 0, _widthTFT, _heightTFT, color);
 }
 
-// Desc: Fills the whole screen with a given color.
+// @brief Fills the whole screen with a given color.
 // wraps TFTfillRectangleBuffer which uses a heap buffer
 // much faster(5*) than TFTfillScreen
+// @param color
 void TFTfillScreenBuffer(uint16_t color)
 {
 	TFTfillRectangleBuffer(0, 0, _widthTFT, _heightTFT, color);
 }
 
-// Desc: Draws a vertical line starting at (x,y) with height h.
+// @brief Draws a vertical line starting at (x,y) with height h.
 
 void TFTdrawFastVLine(uint8_t x, uint8_t y, uint8_t h, uint16_t color) {
     uint8_t hi, lo;
@@ -421,7 +428,7 @@ void TFTdrawFastVLine(uint8_t x, uint8_t y, uint8_t h, uint16_t color) {
     TFT_CS_SetHigh();
 }
 
-// Desc: Draws a horizontal line starting at (x,y) with width w.
+// @brief Draws a horizontal line starting at (x,y) with width w.
 
 void TFTdrawFastHLine(uint8_t x, uint8_t y, uint8_t w, uint16_t color) {
     uint8_t hi, lo;
@@ -441,7 +448,7 @@ void TFTdrawFastHLine(uint8_t x, uint8_t y, uint8_t w, uint16_t color) {
     TFT_CS_SetHigh();
 }
 
-// Desc: draws a circle where (x0,y0) are center coordinates an r is circle radius.
+// @brief draws a circle where (x0,y0) are center coordinates an r is circle radius.
 
 void TFTdrawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
     int16_t f, ddF_x, ddF_y, x, y;
@@ -470,7 +477,7 @@ void TFTdrawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
     }
 }
 
-// Desc : used internally by drawRoundRect
+// @brief used internally by drawRoundRect
 
 void TFTdrawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color) {
     int16_t f, ddF_x, ddF_y, x, y;
@@ -503,7 +510,7 @@ void TFTdrawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, 
     }
 }
 
-// Desc : used internally by fill circle fillRoundRect
+// @brief used internally by fill circle fillRoundRect
 
 void TFTfillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color) {
     int16_t f, ddF_x, ddF_y, x, y;
@@ -534,7 +541,7 @@ void TFTfillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
     TFTfillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
-// Desc: draws rectangle at (x,y) where h is height and w is width of the rectangle.
+// @brief draws rectangle at (x,y) where h is height and w is width of the rectangle.
 
 void TFTdrawRectWH(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
     TFTdrawFastHLine(x, y, w, color);
@@ -543,7 +550,7 @@ void TFTdrawRectWH(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
     TFTdrawFastVLine(x + w - 1, y, h, color);
 }
 
-// Desc : draws a line from (x0,y0) to (x1,y1).
+// @brief draws a line from (x0,y0) to (x1,y1).
 
 void TFTdrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color) {
     int16_t steep, dx, dy, err, ystep;
@@ -580,7 +587,7 @@ void TFTdrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
     }
 }
 
-// Desc : fills a rectangle starting from coordinates (x,y) with width of w and height of h.
+// @brief fills a rectangle starting from coordinates (x,y) with width of w and height of h.
 
 void TFTfillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
     int16_t i;
@@ -589,7 +596,7 @@ void TFTfillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
     }
 }
 
-// Desc: draws a rectangle with rounded edges. h: height, w:width, r: radius of the rounded edges.
+// @brief draws a rectangle with rounded edges. h: height, w:width, r: radius of the rounded edges.
 
 void TFTdrawRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color) {
     TFTdrawFastHLine(x + r, y, w - 2 * r, color);
@@ -602,7 +609,7 @@ void TFTdrawRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uin
     TFTdrawCircleHelper(x + r, y + h - r - 1, r, 8, color);
 }
 
-// Desc: draws a filled rectangle with rounded edges. h: height, w:width, r: radius of the rounded edges.
+// @brief draws a filled rectangle with rounded edges. h: height, w:width, r: radius of the rounded edges.
 
 void TFTfillRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color) {
     TFTfillRect(x + r, y, w - 2 * r, h, color);
@@ -611,7 +618,7 @@ void TFTfillRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uin
 }
 
 
-// Desc: draws a triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
+// @brief draws a triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
 
 void TFTdrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
     TFTdrawLine(x0, y0, x1, y1, color);
@@ -619,7 +626,7 @@ void TFTdrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
     TFTdrawLine(x2, y2, x0, y0, color);
 }
 
-// Desc: draws a filled triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
+// @brief draws a filled triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
 
 void TFTfillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
     int16_t a, b, y, last, dx01, dy01, dx02, dy02, dx12, dy12, sa, sb;
@@ -765,8 +772,8 @@ uint8_t  TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t b
    return 0;
 }
 
-// Desc :  turn on or off wrap of the text
-//Param1 ; TRUE or FALSE
+// @brief  turn on or off wrap of the text
+// @param w TRUE or FALSE
 
 void TFTsetTextWrap(bool w) {
     _TFTwrap = w;
@@ -833,10 +840,10 @@ uint8_t  TFTdrawText(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t
 	return 0;
 }
 
-// Desc: This command defines the Vertical Scrolling Area of the display where:
-// Param 1: top_fix_height: describes the Top Fixed Area,
-// Param 2: bottom_fix_height: describes the Bottom Fixed Area and
-// Param 3: _scroll_direction: is scroll direction (0 for top to bottom and 1 for bottom to top).
+// @brief This command defines the Vertical Scrolling Area of the display where:
+// @param  topFixHeight, describes the Top Fixed Area,
+// @param  bottomFixHeight describes the Bottom Fixed Area and
+// @param  scrollDirection is scroll direction (0 for top to bottom and 1 for bottom to top).
 
 void TFTsetScrollDefinition(uint8_t topFixHeight, uint8_t bottomFixHeight, bool scrollDirection) {
     uint8_t scroll_height;
@@ -872,8 +879,8 @@ void TFTsetScrollDefinition(uint8_t topFixHeight, uint8_t bottomFixHeight, bool 
     }
 }
 
-// Desc: This method is used together with the setScrollDefinition.
-// These two methods describe the scrolling area and the scrolling mode.
+// @brief This method is used together with the setScrollDefinition.
+// @note  These two methods describe the scrolling area and the scrolling mode.
 
 void TFTVerticalScroll(uint8_t vsp) {
     TFTwriteCommand(ST7735_VSCRSADD);
@@ -882,8 +889,9 @@ void TFTVerticalScroll(uint8_t vsp) {
 }
 
 /*
-Desc: This changes the mode of the display as:
- * Param1: ST7735_modes_e   enum
+@brief This changes the mode of the display as:
+@param mode ST7735_modes_e   enum
+@note
    ST7735_modes_Normal : Normal mode.
    ST7735_modes_Partial: Enable partial mode to work in portions of display 
    ST7735_modes_Idle: IDLE consume less current and shows less color
@@ -941,13 +949,13 @@ void TFTchangeMode(ST7735_modes_e mode) {
 }
 
 
-// Desc: Convert 24-bit color to 16-bit color
+// @brief Convert 24-bit color to 16-bit color
 
 int16_t Color565(int16_t r, int16_t g, int16_t b) {
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-// Desc:  16-bit type to 8-bit types.
+// @brief  16-bit type to 8-bit types.
 
 void TFTpushColor(uint16_t color) {
     uint8_t hi, lo;
@@ -961,9 +969,9 @@ void TFTpushColor(uint16_t color) {
 }
 
 
-//  Desc :  Set the font number
-// Param1: fontnumber 1-6 enum ST7735_FontType_e
-// 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun
+// @brief  Set the font number
+// @param  FontNumber 1-6 enum ST7735_FontType_e
+// @note 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun
 // Fonts must be enabled at top of header file.
 void TFTFontNum(ST7735_FontType_e FontNumber) {
 
@@ -1231,8 +1239,8 @@ uint8_t TFTdrawText2(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t
 	return 0;
 }
 
-// Desc: change rotation of display.
-// Param1 : mode can be 0-3 , enum ST7735_rotate_e 
+// @brief change rotation of display.
+// @param  mode can be 0-3 , enum ST7735_rotate_e
 // 0 = Normal
 // 1=  90 rotate
 // 2 = 180 rotate
@@ -1406,12 +1414,12 @@ uint8_t TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color
     return 0;
 }
 
-// Func Desc: initialise the variables that define the size of the screen
+// @brief @brief initialise the variables that define the size of the screen
 // These offsets can be adjusted for any issues with manufacture tolerance/defects
-// Param 1: Column offset
-// Param 2: Row offset
-// Param 3: Screen width in pixels
-// Param 4: Screen height in pixels
+// @param  colOffset Column offset
+// @param  rowOffset  Row offset
+// @param  width_TFT Screen width in pixels
+// @param  height_TFT Screen height in pixels
 void TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint16_t width_TFT, uint16_t height_TFT)
 {
 	_TFTcolstart = colOffset; 
@@ -1425,8 +1433,8 @@ void TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint16_t width_TFT,
 	_heightStartTFT = height_TFT; // Holds init value will never change after this point
 }
 
-// Func Screen : intialise PCBtype
-// Param 1: Enum TFT_PCBtype_e , 4 choices 0-3
+// @brief Screen : intialise PCBtype
+// param pcbType Enum TFT_PCBtype_e , 4 choices 0-3
 void TFTInitPCBType(ST7735_PCBtype_e pcbType)
 {
 	uint8_t choice = pcbType;
@@ -1447,8 +1455,8 @@ void TFTSPIHWInitialize(SPI_HandleTypeDef  * hspi1)
 
 
 // Write a buffer to Screen
-// Param1 Pointer to the buffer
-// Param2 size of buffer
+// @param spidata Pointer to the buffer
+// @param len size of buffer
 void TFTspiWriteBuffer(uint8_t* spidata, uint32_t len) {
 	TFT_DC_SetHigh();
 	TFT_CS_SetLow();
@@ -1462,8 +1470,8 @@ void TFTspiWriteBuffer(uint8_t* spidata, uint32_t len) {
 		TFT_CS_SetHigh();
 }
 
-// Desc: Write a byte to SPI using software SPI
-// Param1: byte to send
+// @brief Write a byte to SPI using software SPI
+// @param spidata byte to send
 
 void TFTspiWriteSoftware(uint8_t spidata) {
 	uint8_t i;
@@ -1476,30 +1484,66 @@ void TFTspiWriteSoftware(uint8_t spidata) {
 	}
 }
 
-// Writes a bi-clour bitmap to screen using a buffer
-// Same as TFTdrawBitmap but uses a buffered write, pixel row by row
-// Param 1,2  X,Y screen co-ord
-// Param 3,4 width and height of bitmap in pixels
-// Param 4,5 bitmap colors ,bitmap is bi-color,, a foreground and a background
-// Param 6: pointer an array of data containing bitmap data vertically addressed.
-// Note :: ~25 times faster than TFTdrawBitmap
-// Buffer used is W*2 (256 bytes for 128*2) and is assigned on the heap using malloc
-// each pixel needs  two bytes , Buffer holds data for single row of pixels
-void TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *pBmp)
+
+/*!
+	@brief: Draws an bi-color bitmap to screen
+	@param x X coordinate
+	@param y Y coordinate
+	@param w width of the bitmap in pixels
+	@param h height of the bitmap in pixels
+	@param color bitmap foreground colors ,is bi-color
+	@param bgcolor bitmap background colors ,is bi-color
+	@param pBmp  an array of uint8_t containing bitmap data horizontally addressed.
+	@param sizeOfBitmap size of the bitmap
+	@return
+		-# 0=success
+		-# 1=invalid pointer object
+		-# 2=Co-ordinates out of bounds,
+		-# 3=malloc memory allocation failure
+		-# 4=bitmap wrong size
+	@note A horizontal Bitmap's w must be divisible by 8. For a bitmap with w=88 & h=48.
+		  Bitmap excepted size = (88/8) * 48 = 528 bytes. ~25 times faster than TFTdrawBitmap
+          Buffer used is W*2 (256 bytes for 128*2) and is assigned on the heap using malloc
+          each pixel needs  two bytes , Buffer holds data for single row of pixels
+*/
+uint8_t TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const uint8_t *pBmp, uint16_t sizeOfBitmap)
 {
 		int16_t byteWidth = (w + 7) / 8;
 		uint8_t byte = 0;
 		uint16_t mycolor = 0;
 		uint16_t ptr;
 
-		// Check bounds
-		if ((x >= _widthTFT) || (y >= _heightTFT)) return;
-		if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
-		if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+		// size of the bitmap
+		if (sizeOfBitmap != ((w / 8) * h))
+		{
+			//printf("Error TFTdrawBitmap 4 : Horizontal Bitmap size is incorrect:  Check Size =  (w/8 * h): %u  %i  %i \n", sizeOfBitmap, w, h);
+			//printf("Check size = ((w/8)*h) or Is bitmap width divisible evenly by eight or is all bitmap data there or too much \n");
+			return 4;
+		}
+		// Check for null pointer
+		if (pBmp == NULL)
+		{
+			//printf("Error TFTdrawBitmap 1: Bitmap array is nullptr\r\n");
+			return 1;
+		}
+		// 2. Check bounds
+		if ((x >= _widthTFT) || (y >= _heightTFT))
+		{
+			//printf("Error TFTdrawBitmap 2: Out of screen bounds, check x & y\r\n");
+			return 2;
+		}
+		if ((x + w - 1) >= _widthTFT)
+			w = _widthTFT - x;
+		if ((y + h - 1) >= _heightTFT)
+			h = _heightTFT - y;
 
 		// Create bitmap buffer
 		uint8_t* rowBuffer = (uint8_t*)malloc(w * 2);
-		if (rowBuffer == NULL){return;}
+		if (rowBuffer == NULL)
+		{
+			//printf("Error TFTdrawBitmap 3: MALLOC could not assign memory \r\n");
+			return 3;
+		}
 		ptr = 0;
 		TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
 
@@ -1519,7 +1563,7 @@ void TFTdrawBitmapBuffer(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t co
 			ptr = 0;
 		}
 		free(rowBuffer);
-
+		return 0;
 }
 
 /*!
@@ -1568,28 +1612,55 @@ uint8_t TFTfillRectangleBuffer(uint8_t x , uint8_t y , uint8_t w, uint8_t h, uin
 	return 0;
 }
 
-// Desc: Draws an 16 or 24 bit color bitmap to screen from a data Array
-// Param 1,2  X,Y screen co-ord
-// Param 3,4 possible values width and height of bitmap in pixels
-// Param 5 pointer to the databuffer containing data
-// Parma 6 enum ST7735_BMPType_e Pixel  bit resolution 16 or 24 , 565 or RGB.
-// Note uses buffered data , sends data row by row in a buffer 256 bytes
-// for 128 pixel wide screen
-// COnverts 24 bit images to 16 bit internally
-void TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e bmpType) {
+
+/*!
+	@brief: Draws an 16 or 24 bit color bitmap to screen from a data array
+	@param x X coordinate
+	@param y Y coordinate
+	@param w width of the bitmap in pixels
+	@param h height of the bitmap in pixels
+	@param pBmp pointer to data array
+	@param bmpType 16 or 24 bit bitmap ,enum
+	@return
+		-# 0=success
+		-# 1=invalid pointer object
+		-# 2=Co-ordinates out of bounds
+		-# 3=malloc memory allocation failure
+	@note uses buffered data , sends data row by row in a buffer 256 bytes
+    for 128 pixel wide screen. Converts 24 bit images to 16 bit internally
+*/
+uint8_t TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *pBmp, ST7735_BMPType_e bmpType) {
 	uint8_t col, row;
 	uint16_t ptr=0;
 	uint16_t color;
 	uint8_t red, green, blue=0;
 
 	// Check bounds
-	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
-	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
-	if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+
+	// 1. Check for null pointer
+	if (pBmp == NULL)
+	{
+		//printf("Error TFTdrawBitmap24 1: Bitmap array is nullptr\r\n");
+		return 1;
+	}
+	// Check bounds
+	if ((x >= _widthTFT) || (y >= _heightTFT))
+	{
+		//printf("Error TFTdrawBitmap16 2: Out of screen bounds\r\n");
+		return 2;
+	}
+	if ((x + w - 1) >= _widthTFT)
+		w = _widthTFT - x;
+	if ((y + h - 1) >= _heightTFT)
+		h = _heightTFT - y;
 
 	// Create bitmap buffer
 	uint8_t* rowBuffer= (uint8_t*)malloc(w *2);
-	if (rowBuffer == NULL) return;
+	if (rowBuffer == NULL)
+	{
+		//printf("Error TFTdrawBitmap16 3 :MALLOC could not assign memory\r\n");
+		return 3;
+	}
 	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
 
 	for(row = 0; row < h; row++)
@@ -1614,6 +1685,7 @@ void TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const u
 		ptr = 0;
 	}
 	free(rowBuffer);
+	return 0;
 }
 
 //**************** EOF *****************

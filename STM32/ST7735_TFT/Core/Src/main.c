@@ -377,14 +377,18 @@ void Setup(void)
 
 void EndTest(void)
 {
-    TFTfillScreen(ST7735_BLACK);
+    char testString[10];
+    sprintf(testString, "V: %u", TFTgetLibVer());
+	TFTfillScreen(ST7735_BLACK);
     TFTdrawText(5, 50, "Tests over", ST7735_GREEN, ST7735_BLACK, 2);
+    TFTdrawText(5, 80, testString, ST7735_YELLOW, ST7735_BLACK, 2);
+
     while (1);
 }
 
 void Test0(void) {
 
-    TFTFontNum(TFTFont_Default);
+	TFTFontNum(TFTFont_Default);
     TFTdrawText(0, 4, "Default 1", ST7735_WHITE, ST7735_BLACK, 2);
     TFTFontNum(TFTFont_Thick);
     TFTdrawText(0, 22, "THICK 2", ST7735_GREEN, ST7735_BLACK, 2);
@@ -578,21 +582,25 @@ void Test9()
     TFTfillScreen(ST7735_BLACK);
     TFTsetRotation(ST7735_Degrees_0);
     TFTdrawText(20, 20, "Rotate 0", ST7735_YELLOW, ST7735_BLACK, 1);
+    TFTdrawText(20, 100, "Rotate 0", ST7735_YELLOW, ST7735_BLACK, 1);
     HAL_Delay(TEST_DELAY2);
 
     TFTfillScreen(ST7735_BLACK);
     TFTsetRotation(ST7735_Degrees_90);
     TFTdrawText(20, 20, "Rotate 90", ST7735_YELLOW, ST7735_BLACK, 1);
+    TFTdrawText(20, 100, "Rotate 90", ST7735_YELLOW, ST7735_BLACK, 1);
     HAL_Delay(TEST_DELAY2);
     
     TFTfillScreen(ST7735_BLACK);
     TFTsetRotation(ST7735_Degrees_180);
     TFTdrawText(20, 20, "Rotate 180", ST7735_YELLOW, ST7735_BLACK, 1);
+    TFTdrawText(20, 100, "Rotate 180", ST7735_YELLOW, ST7735_BLACK, 1);
     HAL_Delay(TEST_DELAY2);
     
     TFTfillScreen(ST7735_BLACK);
     TFTsetRotation(ST7735_Degrees_270);
     TFTdrawText(20, 20, "Rotate 270", ST7735_YELLOW, ST7735_BLACK, 1);
+    TFTdrawText(20, 100, "Rotate 270", ST7735_YELLOW, ST7735_BLACK, 1);
     HAL_Delay(TEST_DELAY2);
     
     TFTsetRotation(ST7735_Degrees_0);
@@ -651,7 +659,7 @@ void Test14(void)
 #ifdef TFT_BITMAP_BICOLOUR
 extern const uint8_t * pBackUpIconptr; // defined in ST7735_TFT_BITMAPDATA.c
 
-TFTdrawBitmapBuffer(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, pBackUpIconptr);
+TFTdrawBitmapBuffer(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, pBackUpIconptr,  128*(128/8));
 HAL_Delay(TEST_DELAY5);
 TFTfillScreen(ST7735_BLACK);
 #endif
