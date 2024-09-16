@@ -77,8 +77,10 @@ uint16_t _heightStartTFT; // never change after first init
 SPI_HandleTypeDef * _hspi1;
 
 uint16_t TFTLibVersion = 171;
+
 // ********* Function Space *************
 
+// @brief get the current library version number
 uint16_t TFTgetLibVer(void){
 	return TFTLibVersion;
 }
@@ -98,7 +100,7 @@ void TFTspiWriteByte(uint8_t spidata) {
 }
 
 // @brief Write an SPI command
-// @param command byte to send
+// @param cmd command byte to send
 
 void TFTwriteCommand(uint8_t cmd_) {
     TFT_DC_SetLow();
@@ -108,12 +110,12 @@ void TFTwriteCommand(uint8_t cmd_) {
 }
 
 // @brief Write SPI data
-// @param1: data byte to send
+// @param data byte to send
 
-void TFTwriteData(uint8_t data_) {
+void TFTwriteData(uint8_t data) {
     TFT_DC_SetHigh();
     TFT_CS_SetLow();
-    TFTspiWriteByte(data_);
+    TFTspiWriteByte(data);
     TFT_CS_SetHigh();
 }
 
@@ -336,7 +338,7 @@ void TFTRcmd3() {
 
 /*
   @brief SPI displays set an address window rectangle for blitting pixels
-  @param  x0Top left corner x coordinate
+  @param  x0 Top left corner x coordinate
   @param  y0  Top left corner x coordinate
   @param  x1  Width of window
   @param  y1  Height of window
@@ -971,7 +973,7 @@ void TFTpushColor(uint16_t color) {
 
 // @brief  Set the font number
 // @param  FontNumber 1-6 enum ST7735_FontType_e
-// @note 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun
+// @note 1-12 12 fonts
 // Fonts must be enabled at top of header file.
 void TFTFontNum(ST7735_FontType_e FontNumber) {
 
@@ -1014,13 +1016,13 @@ void TFTFontNum(ST7735_FontType_e FontNumber) {
 		_TFTCurrentFontheight = TFTFont_height_8;
 		_TFTCurrentFontLength = TFTFontLenAlphaNum;
 		break;
-	case TFTFont_Bignum: // big nums 16 by 32 (NUMBERS + : only)
+	case TFTFont_Bignum: // big nums 16 by 32 (NUMBERS + - / : only)
 		_TFTCurrentFontWidth = TFTFont_width_16;
 		_TFTCurrentFontoffset = TFTFont_offset_minus;
 		_TFTCurrentFontheight = TFTFont_height_32;
 		_TFTCurrentFontLength = TFTFontLenNumeric;
 		break;
-	case TFTFont_Mednum: // med nums 16 by 16 (NUMBERS + : only)
+	case TFTFont_Mednum: // med nums 16 by 16 (NUMBERS + - / : only)
 		_TFTCurrentFontWidth = TFTFont_width_16;
 		_TFTCurrentFontoffset = TFTFont_offset_minus;
 		_TFTCurrentFontheight = TFTFont_height_16;
@@ -1686,6 +1688,32 @@ uint8_t TFTdrawBitmap1624Buffer(uint8_t x, uint8_t y, uint8_t w, uint8_t h, cons
 	}
 	free(rowBuffer);
 	return 0;
+}
+
+// Func Desc: vsprintf wrapper to print numerical data
+// Parameters: https://www.tutorialspoint.com/c_standard_library/c_function_vsprintf.htm
+// The C library function int vsprintf(char *str, const char *format, va_list arg)
+// sends formatted output to a string using an argument list passed to it.
+// Returns: If successful, the total number of characters written is returned,
+// otherwise a negative number is returned.
+// Note: requires stdio.h and stdarg.h libraries
+
+int TFTPrintf(uint8_t x, uint8_t y, uint16_t color, uint16_t bg, uint8_t size, const char *fmt, ...) {
+    int length;
+    char buffer[100];
+    va_list ap;
+
+    va_start(ap, fmt);
+    length = vsprintf(buffer, fmt, ap);
+    va_end(ap);
+    if (length > 0)
+    {
+        if (size > 0)
+        	TFTdrawText(x, y, buffer, color, bg, size);
+        else
+        	TFTdrawText2(x, y, buffer, color, bg);
+    }
+    return length;
 }
 
 //**************** EOF *****************

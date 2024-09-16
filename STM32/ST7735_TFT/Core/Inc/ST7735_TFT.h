@@ -18,7 +18,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>                      // vsprintf
+#include <stdarg.h>                     // varg
 #include "main.h"
+
 
 
 // ******** USER OPTION 4 SPI TYPE ***********
@@ -247,6 +250,7 @@ void TFTsetAddrWindow(uint8_t, uint8_t, uint8_t, uint8_t);
 void TFTpushColor(uint16_t color);
 void TFTsetRotation(ST7735_rotate_e r);
 void TFTchangeMode(ST7735_modes_e m);
+uint16_t TFTgetLibVer(void);
 
 //Scroll 
 void TFTsetScrollDefinition(uint8_t topFixHeight, uint8_t bottomFixHeight, bool scrollDirection);
@@ -283,7 +287,7 @@ uint8_t TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t 
 uint8_t TFTdrawText2(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
 void TFTFontNum(ST7735_FontType_e FontNumber);
 void TFTsetTextWrap(bool w);
-uint16_t TFTgetLibVer(void);
+int TFTPrintf(uint8_t x, uint8_t y, uint16_t color, uint16_t bg, uint8_t size, const char *fmt, ...);
 
 // Bitmap & Icon
 uint8_t TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);

@@ -3,19 +3,19 @@
 
 # ST7735_TFT
 
+
+![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
+
 ## Overview
 
 1. Name: ST7735
-2. Description:  Library for TFT SPI LCD, ST7735 Driver,.
+2. Description:  Library for TFT SPI LCD, ST7735 Driver.
 3. Author: Gavin Lyons
 4. STM32: STM32F070RB nucleo-64 
 5. Toolchain:  STM32cubeIDE, HAL, C.
 6.  Note: this is a fork of PIC project at [link](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 
 ## Software
-
-
-![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
  
 ### Tested
  
@@ -146,8 +146,8 @@ In the bitmap data file you can switch off the tests in USER OPTION 5.
 Output of some of the test routine's on a 128x128 TFT.
 
 1. Different defined colors at default font size 1. Full 16 bit colour 565 available 
-2. Different sizes of default font: 2,3,4 & 5 . Are fonts are scale-able
-3. Different Fonts at font size 2, Fonts 1-5 . font 7-12 not shown here.
+2. Different sizes of default font: 2,3,4 & 5 . fonts 1-6 are scale-able
+3. Different Fonts at font size 2, Fonts 1-5 . font 6-12 not shown here.
 4. Shapes.
 5. MORE shapes!
 6. Bitmap (bi-color) A background and a foreground. 
@@ -160,4 +160,4 @@ Output of some of the test routine's on a 128x128 TFT.
 
 ## Notes
 
-Timer16 and Usart are included just for the Frames per second test TestFPS.
+Timer16 and Usart are included just for the Frames per second test, TestFPS.

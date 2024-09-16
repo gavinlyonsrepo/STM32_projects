@@ -38,7 +38,7 @@
 #define TEST_DELAY1 1000
 #define TEST_DELAY2 2000
 #define TEST_DELAY5 5000
-bool bTestFPS = false;
+bool bTestFPS = true;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,6 +70,7 @@ void Test0(void); // Print out all five fonts, fonts must be enabled in header f
 void Test1A(void); // defined 16-bit Colors, text
 void Test1B(void); // print entire ASCII font 32 to 127
 void Test1C(void); // inverted text
+void Test1D(void); // test TFTprint
 void Test2(void); // font sizes + character draw
 void Test3(void); // pixels and lines
 void Test4(void); // rectangles 
@@ -138,6 +139,7 @@ int main(void)
     Test1A();
     Test1B();
     Test1C();
+    Test1D();
     Test2();
     Test3();
     Test4();
@@ -459,18 +461,46 @@ void Test1B(void) {
 
 void Test1C(void)
 {
-     // Draw a rectangle before text to hide  padding gaps(or fill screen)
+	// test invert font 1-6
+	// Draw a rectangle before text to hide  padding gaps(or fill screen)
     TFTfillRect(0, 4, 100, 17, ST7735_YELLOW); 
     TFTdrawText(0, 5, "Invert 1", ST7735_RED, ST7735_YELLOW, 2);
     // Draw a rectangle to hide padding gaps(or fill screen)
     TFTfillRect(0, 24, 100, 17, ST7735_WHITE); 
     TFTdrawText(0, 25, "Invert 2", ST7735_BLACK, ST7735_WHITE, 2);
+
+    // test invert font 7-12(no need for background)
+    TFTFontNum(TFTFont_ArialBold);
+    TFTdrawText2(0, 65, "Invert 3", ST7735_BLACK, ST7735_WHITE);
     HAL_Delay(TEST_DELAY5);
     TFTfillScreen(ST7735_BLACK);
+    TFTFontNum(TFTFont_Default);
 
 }
     
-    
+
+void Test1D(void)
+{
+	uint16_t myPosInt = 765;
+	int16_t  myNegInt = -12;
+	float myFloat = 3.14422;
+
+    TFTPrintf(5, 5, ST7735_WHITE, ST7735_BLACK, 1, "Pos= %u",myPosInt);
+    TFTPrintf(5, 45, ST7735_WHITE, ST7735_BLACK, 2, "Neg= %d",myNegInt);
+    TFTPrintf(5, 85, ST7735_WHITE, ST7735_BLACK, 1, "float %.2f" ,myFloat);
+
+    HAL_Delay(TEST_DELAY5);
+    TFTfillScreen(ST7735_BLACK);
+
+    TFTFontNum(TFTFont_Dedica);
+    TFTPrintf(5, 5, ST7735_WHITE, ST7735_BLACK, 0, "Pos num %u",myPosInt);
+    TFTPrintf(5, 45, ST7735_WHITE, ST7735_BLACK, 0, "Neg num %d",myNegInt);
+    TFTPrintf(5, 85, ST7735_WHITE, ST7735_BLACK, 0, "float %.2f" ,myFloat);
+    HAL_Delay(TEST_DELAY5);
+    TFTfillScreen(ST7735_BLACK);
+
+    TFTFontNum(TFTFont_Default);
+}
 
 void Test2(void) {
     char *txttwo = "TEST";
