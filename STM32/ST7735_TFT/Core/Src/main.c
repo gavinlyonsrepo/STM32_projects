@@ -38,7 +38,7 @@
 #define TEST_DELAY1 1000
 #define TEST_DELAY2 2000
 #define TEST_DELAY5 5000
-bool bTestFPS = true;
+bool bTestFPS = false;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

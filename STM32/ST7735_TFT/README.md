@@ -79,6 +79,9 @@ Font Methods:
 | 1-6 | drawText |Y| draws character array |
 | 7-12 | drawChar2|N| draws single  character |
 | 7-12 | drawText2|N| draws character array |
+| 1-12 | TFTprint |~| Polymorphic, prints many types of data using vsprint |
+
+The  TFTprint method  included uses vsprint to print numerical  data. In order to use floating point numbers you need to add  -u _printf_float to project properties , C build , settings , MCU Gcc Linker , misc , other flags section. 
 
 These  functions return a number in event of an error, such as wrong font chosen , ASCII character outside chosen fonts range, character out of screen bounds and invalid character array pointer object. 
 
@@ -161,3 +164,4 @@ Output of some of the test routine's on a 128x128 TFT.
 ## Notes
 
 Timer16 and Usart are included just for the Frames per second test, TestFPS.
+The FPS(frame per second) test is enabled by a boolean variable flag in main.c
