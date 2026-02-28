@@ -15,15 +15,15 @@ A collection of projects and libraries for the STM32 based micro-controller fami
 
 | # | IC | ToolChain | Description  | Link |
 | --- | --- | --- | --- | --- |
-| 1 | STM32F303K8T6 Nucleo-32 | STM32CubeIDE C HAL | Environment monitor  |[URL ](STM32/bmp280/)|
+| 1 | STM32F303K8T6 Nucleo-32 | STM32CubeIDE C HAL | Environment monitor project | [URL ](STM32/bmp280/) |
 | --- | --- | --- | --- | --- |
 
 ## Libraries
 
 | # | IC | ToolChain | Description  | Link |
 | --- | --- | --- | --- | --- |
-|1| STM32F070RBT6 Nucleo-64 | STM32CubeIDE C++ HAL | ERM19264_UC1609 LCD |[URL ](STM32/ERM19264/)|
-|2| STM32F070RBT6 Nucleo-64 | STM32CubeIDE C  HAL | ST7735 TFT LCD |[URL ](STM32/ST7735_TFT/)|
+|1| STM32F070RBT6 Nucleo-64 | STM32CubeIDE C++ HAL | ERM19264_UC1609 LCD | [URL ](STM32/ERM19264/) |
+|2| STM32F070RBT6 Nucleo-64 | STM32CubeIDE C  HAL | ST7735 TFT LCD | [URL ](STM32/ST7735_TFT/) |
 
 
 
