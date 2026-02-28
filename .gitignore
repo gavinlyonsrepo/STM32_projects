@@ -1,8 +1,6 @@
 # root
 stuff/
 
-
-
 #STM32
 STM32/64blink/
 STM32/adc_dma_vidfour/
@@ -32,7 +30,13 @@ STM32/ST7735_TFT/.*project
 STM32/ST7735_TFT/STM32*
 
 # bmp280
-
+STM32/bmp280/Debug/
+STM32/bmp280/Drivers/
+STM32/bmp280/bmp280*
+STM32/bmp280/.settings/*
+STM32/bmp280/core/Startup/
+STM32/bmp280/.*project
+STM32/bmp280/STM32*
 
 #radio
 STM32/radio/
