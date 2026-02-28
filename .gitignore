@@ -1,6 +1,8 @@
 # root
 stuff/
 
+
+
 #STM32
 STM32/64blink/
 STM32/adc_dma_vidfour/
@@ -16,19 +18,6 @@ STM32/timerex3F070/
 STM32/timeruSdelayexF070/
 STM32/.metadata
 
-# tm1638
-STM32/tm1638plus/Debug/
-STM32/tm1638plus/Drivers/
-
-# nokia 
-STM32/nokia5110text/Debug/
-STM32/nokia5110text/Drivers/
-STM32/nokia5110text/.cproject
-STM32/nokia5110text/.settings/language.settings.xml
-STM32/nokia5110text/nokia5110text Debug.launch
-STM32/nokia5110text/.settings/stm32cubeide.project.prefs
-
-
 # erm19264
 STM32/ERM19264/Debug/
 STM32/ERM19264/Drivers/
@@ -42,18 +31,24 @@ STM32/ST7735_TFT/core/Startup/
 STM32/ST7735_TFT/.*project
 STM32/ST7735_TFT/STM32*
 
+# bmp280
+
+
+#radio
+STM32/radio/
 
 # AHT10
-STM32/AHT10/Debug/
-STM32/AHT10/Drivers/
-STM32/AHT10/*.pdf
+STM32/AHT10/
 
 # LM75A
-STM32/LM75a/Debug/
-STM32/LM75a/Drivers/
-STM32/LM75a/*.pdf
+STM32/LM75a/
 
 # HD44780
-STM32/HD44780/Debug/
-STM32/HD44780/Drivers/
-STM32/HD44780/*.pdf
+STM32/HD44780/
+
+# tm1638
+STM32/tm1638plus/
+
+# nokia 
+STM32/nokia5110text/
+
