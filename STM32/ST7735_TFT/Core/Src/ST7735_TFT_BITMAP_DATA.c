@@ -145,7 +145,7 @@ const uint8_t * pBackUpIconptr = backupicon; // this is declared extern in targe
 
 
 #ifdef TFT_BITMAP_16COLOUR
-// array size is 32768 (128x128x2) https://notisrac.github.io/FileToCArray/
+// array size is 32768 (128x128x2) https://github.com/gavinlyonsrepo/Guardian_LTSM
 // 16pic1.bmp "motor"
 // BITMAPV5HEADER offset 132(raw data here)
 // made in GIMP , Color space information written

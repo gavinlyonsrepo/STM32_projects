@@ -123,8 +123,7 @@ In the bitmap data file you can switch off the tests in USER OPTION 5.
 
 1. Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
 2. Math in bitmap size column 2-4  assumes 128x128 pixel screen.
-3. The data array for 1 -3 is created from image files using file data conversion tool [link](https://javl.github.io/image2cpp/)
-4. The data array for 4 is created from BMP files using file data conversion tool [link](https://notisrac.github.io/FileToCArray/)
+3. The data array's are created using this file [data conversion tool link](https://github.com/gavinlyonsrepo/Guardian_LTSM)
 
  
 ## Hardware
