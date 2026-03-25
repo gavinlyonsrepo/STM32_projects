@@ -27,9 +27,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define INIT_DELAY 100
-#define DISPLAY_DELAY_2 2000
-#define DISPLAY_DELAY 5000
+typedef enum {
+	WEATHER_STORMY,
+	WEATHER_RAINY,
+	WEATHER_CHANGE,
+	WEATHER_FAIR,
+	WEATHER_DRY
+} WeatherState_e;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,7 +56,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-void PrintSensorData(void);
+WeatherState_e PrintSensorData(void);
+void PrintForecast(WeatherState_e);
 void Setup(void);
 /* USER CODE END PFP */
 
@@ -102,7 +107,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  PrintSensorData();
+	  PrintForecast(PrintSensorData());
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -251,7 +257,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void Setup(void) {
-    HAL_Delay(INIT_DELAY);
+    HAL_Delay(100);
     uint8_t  chipId      = 0;
 
     // check LCD IS ON BUS connection
@@ -301,9 +307,10 @@ void Setup(void) {
     }
 }
 
-void PrintSensorData(void) {
+WeatherState_e PrintSensorData(void) {
 
-    PCF8574_LCDClearScreen();
+    PCF8574_LCDClearLine(LCDLineNumberOne);
+    WeatherState_e WeatherForecast;
     static uint8_t SensorCountRead = 0;
     int32_t  tempC   = 0;
     uint32_t pressPa = 0;
@@ -327,11 +334,53 @@ void PrintSensorData(void) {
 
     PCF8574_LCDGOTO(LCDLineNumberTwo, 0);
     PCF8574_LCDPrintf("Press: %lu hPa", pressHpa);
-
-    HAL_Delay(DISPLAY_DELAY);
+    HAL_Delay(7000);
     uart_buf_len = sprintf((char*)uart_buf, "Sensor Read %u\r\n", SensorCountRead++);
     HAL_UART_Transmit(&huart2, (uint8_t*) uart_buf, uart_buf_len, 100);
     HAL_Delay(50);
+    if (pressHpa <= 983) {
+    	WeatherForecast = WEATHER_STORMY;
+    }
+    else if (pressHpa < 998) {
+    	WeatherForecast = WEATHER_RAINY;
+    }
+    else if (pressHpa < 1012) {
+    	WeatherForecast = WEATHER_CHANGE;
+    }
+    else if (pressHpa < 1025) {
+    	WeatherForecast = WEATHER_FAIR;
+    }
+    else {
+    	WeatherForecast = WEATHER_DRY;
+    }
+    return WeatherForecast;
+}
+
+void PrintForecast(WeatherState_e WeatherForecast)
+{
+	PCF8574_LCDClearLine(LCDLineNumberTwo);
+	PCF8574_LCDGOTO(LCDLineNumberOne, 0);
+	switch (WeatherForecast) {
+		case WEATHER_STORMY:
+			PCF8574_LCDSendString("Forecast: STORMY");
+			break;
+		case WEATHER_RAINY:
+			PCF8574_LCDSendString("Forecast: RAINY ");
+			break;
+		case WEATHER_CHANGE:
+			PCF8574_LCDSendString("Forecast: CHANGE");
+			break;
+		case WEATHER_FAIR:
+			PCF8574_LCDSendString("Forecast: FAIR  ");
+			break;
+		case WEATHER_DRY:
+			PCF8574_LCDSendString("Forecast: DRY   ");
+			break;
+		default:
+			PCF8574_LCDSendString("Forecast: UNKNOWN");
+			break;
+	}
+	HAL_Delay(5000);
 }
 
 
